@@ -26,12 +26,3 @@ A simple Android application for managing invoices. Built using Jetpack Compose,
 ### 4. Share Invoice
 
 ![Share Invoice](./screenshots/share_invoice.png)
-
-## Installation
-
-To get started with the Simple Invoice App, follow these steps:
-
-1. **Clone the Repository**
-
-   ```sh
-   git clone https://github.com/your-username/simple-invoice-app.git
