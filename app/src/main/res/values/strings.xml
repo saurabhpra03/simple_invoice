@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">SimpleInvoice</string>
+    <string name="email_id">Email id</string>
+    <string name="empty_email_id">Please enter a email id.</string>
+    <string name="invalid_email_id">Please enter a valid email id.</string>
+    <string name="password">Password</string>
+    <string name="empty_password">Please enter a password.</string>
+    <string name="invalid_password">Please enter a valid password.</string>
+    <string name="login">Login</string>
+    <string name="no_account_sign_up">Don\'t have an account?\nSign up now to get started!</string>
+    <string name="name">Name</string>
+    <string name="empty_name">Please enter a name.</string>
+    <string name="sign_up">Signup</string>
+    <string name="already_account_login">Already have an account?\nLog in to continue.</string>
+</resources>
