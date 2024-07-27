@@ -1,24 +1,37 @@
-Invoice App
-Welcome to the Invoice App! This Android application allows users to manage invoices with features for creating, viewing, downloading, and sharing. Built with Android Studio, Jetpack Compose, Room, and Dagger-Hilt.
+# Simple Invoice App
 
-Features
-User Authentication: Register and log in to access invoices securely.
-Invoice Management: Create, view, and manage your invoices.
-Download and Share: Download invoices as PDFs and share via WhatsApp.
-Local Storage: Secure invoice data with Room database.
-Screenshots
-Login Screen
+A simple Android application for managing invoices. Built using Jetpack Compose, Room Database, and Dagger-Hilt.
 
-User authentication for secure access.
+## Features
 
-Dashboard Screen
+- **User Authentication**: Register and log in to your account.
+- **Invoice Management**: Create, view, and manage invoices.
+- **Download & Share**: Download invoices and share them via WhatsApp.
+- **Modern UI**: Developed using Jetpack Compose for a seamless user experience.
 
-Overview of created invoices with options to view, download, or share.
+## Screenshots
 
-Create Invoice Screen
+### 1. Login Screen
 
-Form for entering invoice details and generating new invoices.
+![Login Screen](./screenshots/login_screen.png)
 
-Invoice Detail Screen
+### 2. Invoice Creation
 
-Detailed view of a selected invoice with download and share options.
+![Invoice Creation](./screenshots/invoice_creation.png)
+
+### 3. Invoice List
+
+![Invoice List](./screenshots/invoice_list.png)
+
+### 4. Share Invoice
+
+![Share Invoice](./screenshots/share_invoice.png)
+
+## Installation
+
+To get started with the Simple Invoice App, follow these steps:
+
+1. **Clone the Repository**
+
+   ```sh
+   git clone https://github.com/your-username/simple-invoice-app.git
