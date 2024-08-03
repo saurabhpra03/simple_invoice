@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.daggerHiltAndroid)
 }
 
 android {
@@ -13,7 +15,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -73,4 +75,15 @@ dependencies {
 
     // Material icons
     implementation(libs.androidx.material.icons.extended)
+
+    // Room db
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    // Hilt
+    implementation(libs.google.dagger.hilt.android)
+    ksp(libs.google.dagger.hilt.compiler)
+
 }
