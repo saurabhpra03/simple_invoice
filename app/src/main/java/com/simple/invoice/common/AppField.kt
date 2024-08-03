@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,8 +90,7 @@ fun AppField(
             textStyle = TextStyle(
                 fontSize = 15.sp,
                 fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Normal,
-                color = Black,
+                fontWeight = FontWeight.Normal
             )
 
         )
@@ -103,7 +103,7 @@ fun AppField(
                 fontSize = 12.sp,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Normal,
-                color = Red
+                color = MaterialTheme.colorScheme.error
             )
         )
     }

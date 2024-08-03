@@ -18,9 +18,14 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme = lightColorScheme(
     primary = Green,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    background = White
+    onPrimary = White,
+    background = White,
+    onBackground = Black,
+    surface = White,
+    onSurface = Black,
+    outline = Green,
+    error = Red,
+    onError = White
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -40,15 +45,8 @@ fun SimpleInvoiceTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if(darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
