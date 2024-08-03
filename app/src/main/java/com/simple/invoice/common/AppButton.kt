@@ -24,10 +24,6 @@ fun AppButton(
         modifier = Modifier
             .fillMaxWidth()
             .height(45.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Green,
-            contentColor = White
-        ),
         onClick = onClick
     ) {
 
