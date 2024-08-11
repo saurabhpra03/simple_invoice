@@ -93,5 +93,11 @@ dependencies {
     // Coroutine
     implementation(libs.kotlinx.coroutines.android)
 
+    // Hilt navigation
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Constraintlayout
+    implementation(libs.androidx.constraintlayout.compose)
+
 
 }

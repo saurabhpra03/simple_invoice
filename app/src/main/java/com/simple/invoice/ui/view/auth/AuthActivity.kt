@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.simple.invoice.common.AppStatusBarColor
 import com.simple.invoice.ui.theme.SimpleInvoiceTheme
 import com.simple.invoice.ui.utils.Screens
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +29,8 @@ class AuthActivity : ComponentActivity() {
             SimpleInvoiceTheme(
                 darkTheme = false,
             ) {
+
+                AppStatusBarColor()
 
                 Scaffold(
                     modifier = Modifier
@@ -54,4 +57,7 @@ class AuthActivity : ComponentActivity() {
             }
         }
     }
+
+
 }
+

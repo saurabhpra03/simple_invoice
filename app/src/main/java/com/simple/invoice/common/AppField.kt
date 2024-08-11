@@ -1,7 +1,9 @@
 package com.simple.invoice.common
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -42,10 +44,12 @@ fun AppField(
 
     var showPassword by remember { mutableStateOf(false) }
 
-    Column {
+    Column(modifier = modifier) {
 
         OutlinedTextField(
-            modifier = modifier,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
             value = value,
             onValueChange = onValueChange,
             label = {
