@@ -1,10 +1,7 @@
 package com.simple.invoice.common
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -27,14 +24,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.simple.invoice.ui.theme.Black
+import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.ui.theme.Green
-import com.simple.invoice.ui.theme.Red
 
 @Composable
 fun AppField(
+    modifier: Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     hint: String,
@@ -50,16 +45,14 @@ fun AppField(
     Column {
 
         OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
+            modifier = modifier,
             value = value,
             onValueChange = onValueChange,
             label = {
                 Text(
                     text = hint,
                     style = TextStyle(
-                        fontSize = 15.sp,
+                        fontSize = Dimen.fieldTxtSize,
                         fontStyle = FontStyle.Normal,
                         fontWeight = FontWeight.Normal
                     )
@@ -88,7 +81,7 @@ fun AppField(
             },
             maxLines = 1,
             textStyle = TextStyle(
-                fontSize = 15.sp,
+                fontSize = Dimen.fieldTxtSize,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Normal
             )
@@ -97,10 +90,10 @@ fun AppField(
 
         Text(
             modifier = Modifier
-                .padding(top = 3.dp),
+                .padding(top = Dimen.dimen3),
             text = errorMsg,
             style = TextStyle(
-                fontSize = 12.sp,
+                fontSize = Dimen.errorTxtSize,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.error

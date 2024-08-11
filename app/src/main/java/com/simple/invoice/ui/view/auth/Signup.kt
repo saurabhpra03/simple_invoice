@@ -3,9 +3,11 @@ package com.simple.invoice.ui.view.auth
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,16 +25,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.simple.invoice.R
 import com.simple.invoice.common.AppButton
 import com.simple.invoice.common.AppField
-import com.simple.invoice.common.ButtonSpace
-import com.simple.invoice.common.FieldSpace
 import com.simple.invoice.ui.theme.Black
+import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.ui.utils.Screens
 import com.simple.invoice.utils.Constants
 import com.simple.invoice.utils.Validator
@@ -80,6 +79,9 @@ fun SignupScreen(navController: NavController) {
     ) {
 
         AppField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
             value = name,
             onValueChange = nameUpdate,
             hint = stringResource(id = R.string.name),
@@ -88,9 +90,11 @@ fun SignupScreen(navController: NavController) {
             keyboardType = KeyboardType.Text
         )
 
-        FieldSpace()
-
         AppField(
+            modifier = Modifier
+                .padding(top = Dimen.dimen20)
+                .fillMaxWidth()
+                .wrapContentHeight(),
             value = emailId,
             onValueChange = emailIdUpdate,
             hint = stringResource(id = R.string.email_id),
@@ -99,9 +103,11 @@ fun SignupScreen(navController: NavController) {
             keyboardType = KeyboardType.Email
         )
 
-        FieldSpace()
-
         AppField(
+            modifier = Modifier
+                .padding(top = Dimen.dimen20)
+                .fillMaxWidth()
+                .wrapContentHeight(),
             value = password,
             onValueChange = passwordUpdate,
             hint = stringResource(id = R.string.password),
@@ -112,16 +118,18 @@ fun SignupScreen(navController: NavController) {
             imeAction = ImeAction.Done
         )
 
-        ButtonSpace()
-
-        AppButton(txt = stringResource(id = R.string.sign_up)) {
+        AppButton(
+            modifier = Modifier
+                .padding(Dimen.dimen30)
+                .fillMaxWidth()
+                .height(Dimen.buttonHeight),
+            txt = stringResource(id = R.string.sign_up)) {
 
         }
 
-        Spacer(modifier = Modifier.height(30.dp))
-
         Text(
             modifier = Modifier
+                .padding(top = Dimen.dimen30)
                 .clickable {
                     Constants.finishAndGotoNextScreen(
                         navController = navController,
@@ -130,7 +138,7 @@ fun SignupScreen(navController: NavController) {
                 },
             text = stringResource(id = R.string.already_account_login),
             style = TextStyle(
-                fontSize = 13.sp,
+                fontSize = Dimen.txt13,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Normal,
                 color = Black
