@@ -62,6 +62,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -85,15 +89,6 @@ dependencies {
     // Hilt
     implementation(libs.google.dagger.hilt.android)
     ksp(libs.google.dagger.hilt.compiler)
-
-    // Lifecycle LiveData ViewModel
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
-    ksp(libs.androidx.lifecycle.compiler)
 
     // Coroutine
     implementation(libs.kotlinx.coroutines.android)
