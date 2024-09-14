@@ -15,7 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.simple.invoice.common.AppStatusBarColor
 import com.simple.invoice.ui.theme.SimpleInvoiceTheme
-import com.simple.invoice.ui.utils.Screens
+import com.simple.invoice.utils.Screens
 import com.simple.invoice.utils.SharedPref
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

@@ -32,7 +32,7 @@ import com.simple.invoice.common.AppLoader
 import com.simple.invoice.data.Resource
 import com.simple.invoice.ui.theme.Black
 import com.simple.invoice.ui.theme.Dimen
-import com.simple.invoice.ui.utils.Screens
+import com.simple.invoice.utils.Screens
 import com.simple.invoice.ui.view.MainActivity
 import com.simple.invoice.ui.viewModel.AuthViewModel
 import com.simple.invoice.utils.Constants.finishAndGotoNextActivity

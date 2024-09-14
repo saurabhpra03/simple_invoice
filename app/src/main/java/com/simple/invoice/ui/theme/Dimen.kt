@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.sp
 object Dimen {
     val dimen3: Dp = 3.dp
     val dimen45: Dp = 45.dp
+    val dimen17: Dp = 17.dp
     val dimen20: Dp = 20.dp
     val dimen30: Dp = 30.dp
 

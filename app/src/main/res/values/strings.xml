@@ -19,9 +19,12 @@
     <string name="successfully_login">You have successfully logged in.</string>
     <string name="login_failed">Login failed. Please check your email and password and try again.</string>
     <string name="empty_item">Please enter item name or description.</string>
-    <string name="empty_unit_price">Please enter the unit price.</string>
-    <string name="unit_price">Unit Price</string>
+    <string name="empty_price">Please enter the price.</string>
+    <string name="price">Price</string>
     <string name="description_of_item">Description of item</string>
-    <string name="gst_with_colon">GST:</string>
+    <string name="gst">GST</string>
     <string name="ruppe_symbol">\u20B9</string>
+    <string name="qty">Qty</string>
+    <string name="total_amount">Total Amount</string>
+    <string name="add">Add</string>
 </resources>
