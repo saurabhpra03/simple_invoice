@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,61 +23,60 @@ class AuthViewModel @Inject constructor(
     private val coroutineDispatcherProvider: CoroutineDispatcherProvider
 ) : ViewModel() {
 
-    private val _signUpFlow = MutableStateFlow<Resource?>(null)
-    val signUpFlow: StateFlow<Resource?> get() = _signUpFlow
+    private val _signUpFlow = MutableStateFlow<Resource<Auth>?>(null)
+    val signUpFlow: StateFlow<Resource<Auth>?> get() = _signUpFlow
 
-    private val _loginFlow = MutableStateFlow<Resource?>(null)
-    val loginFlow: StateFlow<Resource?> get() = _loginFlow
+    private val _loginFlow = MutableStateFlow<Resource<Auth>?>(null)
+    val loginFlow: StateFlow<Resource<Auth>?> get() = _loginFlow
 
-    fun isUserExists(auth: Auth){
+    fun signUp(auth: Auth) {
         _signUpFlow.value = Resource.Loading
         viewModelScope.launch(coroutineDispatcherProvider.IO()) {
             try {
-                val response: Int = repository.isUserExists(auth.emailId)
-                if (response > 0){
-                    _signUpFlow.value = Resource.Failed(context.getString(R.string.user_already_exists))
-                }else{
-                    addUser(auth)
-                }
-            }catch (e: Exception){
-                _signUpFlow.value = Resource.Failed(e.message ?: context.getString(R.string.error_occurred_try_again))
-            }
-        }
-    }
-
-    private fun addUser(auth: Auth) {
-        viewModelScope.launch(coroutineDispatcherProvider.IO()) {
-            try {
                 val result = repository.addUser(auth)
-                if (result > 0){
-                    _signUpFlow.value = Resource.Success(context.getString(R.string.successfully_registered))
-                }else{
-                    _signUpFlow.value = Resource.Failed(context.getString(R.string.registration_failed))
+                withContext(coroutineDispatcherProvider.Main()) {
+                    if (result > 0) {
+                        auth.id = result.toInt()
+                        _signUpFlow.value = Resource.Success(auth)
+                    } else {
+                        _signUpFlow.value =
+                            Resource.Failed(context.getString(R.string.email_id_or_account_already_exists))
+                    }
                 }
-            }catch (e: Exception){
-                _signUpFlow.value = Resource.Failed(e.message ?: context.getString(R.string.error_occurred_try_again))
+            } catch (e: Exception) {
+                withContext(coroutineDispatcherProvider.Main()) {
+                    _signUpFlow.value = Resource.Failed(
+                        e.message ?: context.getString(R.string.error_occurred_try_again)
+                    )
+                }
             }
         }
     }
 
-    fun login(emailId: String, password: String){
+    fun login(emailId: String, password: String) {
         _loginFlow.value = Resource.Loading
         viewModelScope.launch(coroutineDispatcherProvider.IO()) {
             try {
                 val response: Auth? = repository.login(emailId, password)
                 response?.let {
-                    _loginFlow.value = Resource.Success(context.getString(R.string.successfully_login))
+                    _loginFlow.value = Resource.Success(it)
                 } ?: run {
                     _loginFlow.value = Resource.Failed(context.getString(R.string.login_failed))
                 }
-            }catch (e: Exception){
-                _loginFlow.value = Resource.Failed(e.message ?: context.getString(R.string.error_occurred_try_again))
+            } catch (e: Exception) {
+                _loginFlow.value = Resource.Failed(
+                    e.message ?: context.getString(R.string.error_occurred_try_again)
+                )
             }
         }
     }
 
-    fun clearAuthFlow(){
+    fun clearSignUpFlow() {
         _signUpFlow.value = null
+
+    }
+
+    fun clearSignInFlow() {
         _loginFlow.value = null
     }
 

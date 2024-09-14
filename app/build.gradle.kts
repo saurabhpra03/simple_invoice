@@ -99,5 +99,8 @@ dependencies {
     // Constraintlayout
     implementation(libs.androidx.constraintlayout.compose)
 
+    // Gson
+    implementation(libs.gson)
+
 
 }

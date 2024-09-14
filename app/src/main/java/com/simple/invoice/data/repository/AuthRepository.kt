@@ -8,8 +8,6 @@ class AuthRepository @Inject constructor(private val authDao: AuthDao) {
 
     suspend fun addUser(auth: Auth) = authDao.add(auth)
 
-    suspend fun isUserExists(emailId: String) = authDao.isUserExists(emailId)
-
     suspend fun login(emailId: String, password: String) = authDao.login(emailId, password)
 
 }

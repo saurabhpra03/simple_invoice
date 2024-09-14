@@ -13,9 +13,15 @@
     <string name="sign_up">Signup</string>
     <string name="already_account_login">Already have an account?\nLog in to continue.</string>
     <string name="successfully_registered">You have successfully registered.</string>
-    <string name="registration_failed">Registration failed. Please try again later.</string>
+    <string name="email_id_or_account_already_exists">Email ID or account already exists.</string>
     <string name="error_occurred_try_again">An error occurred. Please try again.</string>
     <string name="user_already_exists">An account with this email already exists. Please use a different email or log in instead.</string>
     <string name="successfully_login">You have successfully logged in.</string>
     <string name="login_failed">Login failed. Please check your email and password and try again.</string>
+    <string name="empty_item">Please enter item name or description.</string>
+    <string name="empty_unit_price">Please enter the unit price.</string>
+    <string name="unit_price">Unit Price</string>
+    <string name="description_of_item">Description of item</string>
+    <string name="gst_with_colon">GST:</string>
+    <string name="ruppe_symbol">\u20B9</string>
 </resources>

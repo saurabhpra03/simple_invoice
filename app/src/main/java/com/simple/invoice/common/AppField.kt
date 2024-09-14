@@ -35,7 +35,6 @@ fun AppField(
     value: String,
     onValueChange: (String) -> Unit,
     hint: String,
-    isError: Boolean,
     errorMsg: String,
     keyboardType: KeyboardType,
     imeAction: ImeAction = ImeAction.Next,
@@ -62,10 +61,9 @@ fun AppField(
                     )
                 )
             },
-            isError = isError,
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType,
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 imeAction = imeAction
             ),
             trailingIcon = {

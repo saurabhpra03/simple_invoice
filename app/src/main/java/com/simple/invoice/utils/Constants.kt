@@ -8,9 +8,9 @@ import androidx.navigation.NavController
 
 object Constants {
 
-    fun finishAndGotoNextScreen(navController: NavController, route: String) {
-        navController.popBackStack()
-        navController.navigate(route) {
+    fun NavController.finishAndGotoNextScreen(route: String) {
+        this.popBackStack()
+        this.navigate(route) {
             launchSingleTop = true
         }
     }
