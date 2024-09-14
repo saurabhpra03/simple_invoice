@@ -16,10 +16,16 @@ import androidx.navigation.compose.rememberNavController
 import com.simple.invoice.common.AppStatusBarColor
 import com.simple.invoice.ui.theme.SimpleInvoiceTheme
 import com.simple.invoice.ui.utils.Screens
+import com.simple.invoice.utils.SharedPref
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AuthActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var sharedPref: SharedPref
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -46,11 +52,11 @@ class AuthActivity : ComponentActivity() {
                     ) {
 
                         composable(Screens.Auth.Login.route) {
-                            LoginScreen(navController = navController)
+                            LoginScreen(navController = navController, sharedPref = sharedPref)
                         }
 
                         composable(Screens.Auth.Signup.route) {
-                            SignupScreen(navController = navController)
+                            SignupScreen(navController = navController, sharedPref = sharedPref)
                         }
                     }
                 }

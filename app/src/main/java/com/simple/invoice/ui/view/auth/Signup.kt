@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.simple.invoice.R
@@ -72,6 +73,7 @@ fun SignupScreen(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     bottom.linkTo(refFieldEmailID.top, Dimen.dimen20)
+                    width = Dimension.fillToConstraints
                 },
             value = name,
             onValueChange = {
@@ -89,6 +91,7 @@ fun SignupScreen(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     bottom.linkTo(refFieldPassword.top, Dimen.dimen20)
+                    width = Dimension.fillToConstraints
                 },
             value = emailId,
             onValueChange = {
@@ -107,6 +110,7 @@ fun SignupScreen(
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
+                    width = Dimension.fillToConstraints
                 },
             value = password,
             onValueChange = {
@@ -126,6 +130,7 @@ fun SignupScreen(
                     start.linkTo(parent.start)
                     top.linkTo(refFieldPassword.bottom, Dimen.dimen30)
                     end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
                 }, txt = stringResource(id = R.string.sign_up)) {
 
             val email = Validator.isValidEmailId(context, emailId)
@@ -133,7 +138,7 @@ fun SignupScreen(
 
             when{
                 name.trim().isEmpty() -> nameError = context.getString(R.string.empty_name)
-                email.isNotEmpty() -> emailIdError = emailId
+                email.isNotEmpty() -> emailIdError = email
                 pwd.isNotEmpty() -> passwordError = pwd
                 else -> viewModel.signUp(Auth(name = name.trim(), emailId = emailId.trim(), password = password.trim()))
             }

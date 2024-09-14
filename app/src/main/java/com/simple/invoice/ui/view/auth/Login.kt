@@ -121,7 +121,7 @@ fun LoginScreen(
             val pwd = Validator.isValidPassword(context, password)
 
             when {
-                email.isNotEmpty() -> emailIdError = emailId
+                email.isNotEmpty() -> emailIdError = email
                 pwd.isNotEmpty() -> passwordError = pwd
                 else -> viewModel.login(emailId = emailId.trim(), password = password.trim())
             }
