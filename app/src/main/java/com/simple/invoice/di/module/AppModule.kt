@@ -1,7 +1,7 @@
 package com.simple.invoice.di.module
 
 import android.content.Context
-import com.simple.invoice.data.model.dao.AuthDao
+import com.simple.invoice.data.dao.AuthDao
 import com.simple.invoice.di.qualifer.QualifierMyAppDB
 import com.simple.invoice.base.MyAppDB
 import dagger.Module

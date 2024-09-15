@@ -1,7 +1,7 @@
 package com.simple.invoice.data.repository
 
 import com.simple.invoice.data.model.Auth
-import com.simple.invoice.data.model.dao.AuthDao
+import com.simple.invoice.data.dao.AuthDao
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(private val authDao: AuthDao) {

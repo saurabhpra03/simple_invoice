@@ -1,4 +1,4 @@
-package com.simple.invoice.data.model.dao
+package com.simple.invoice.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
