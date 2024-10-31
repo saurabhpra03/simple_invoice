@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
     ForeignKey(
         entity = AuthEntity::class,
         parentColumns = ["id"],
-        childColumns = ["authID"],
+        childColumns = ["authId"],
     )
 ])
 data class InvoiceEntity(
