@@ -61,7 +61,7 @@ fun CreateInvoice(navController: NavController) {
             .fillMaxSize()
     ) {
 
-        val (refFieldItem, refDropDownQty, refDropDownGST, refFieldUnitPrice, refTxtTotalAmount, refBtnAdd) = createRefs()
+        val (refFieldItem, refDropDownQty, refFieldUnitPrice, refDropDownGST, refTxtTotalAmount, refBtnAdd) = createRefs()
 
         AppField(
             modifier = Modifier
@@ -87,7 +87,7 @@ fun CreateInvoice(navController: NavController) {
                 .constrainAs(refDropDownQty) {
                     start.linkTo(parent.start)
                     top.linkTo(refFieldItem.bottom, Dimen.dimen17)
-                    end.linkTo(refDropDownGST.start)
+                    end.linkTo(refFieldUnitPrice.start)
                     width = Dimension.fillToConstraints
                 },
             expanded = isQtyDropDownMenuExpanded,
@@ -143,12 +143,31 @@ fun CreateInvoice(navController: NavController) {
 
         }
 
-        ExposedDropdownMenuBox(
+        AppField(
             modifier = Modifier
-                .constrainAs(refDropDownGST) {
+                .constrainAs(refFieldUnitPrice) {
                     start.linkTo(refDropDownQty.end, Dimen.dimen20)
                     top.linkTo(refFieldItem.bottom, Dimen.dimen17)
                     end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                },
+            value = unitPrice,
+            onValueChange = {
+                unitPrice = it
+                unitPriceError = ""
+            },
+            hint = stringResource(id = R.string.price),
+            errorMsg = unitPriceError,
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done
+        )
+
+        ExposedDropdownMenuBox(
+            modifier = Modifier
+                .constrainAs(refDropDownGST) {
+                    start.linkTo(parent.start)
+                    top.linkTo(refDropDownQty.bottom, Dimen.dimen20)
+                    end.linkTo(refTxtTotalAmount.start)
                     width = Dimension.fillToConstraints
                 },
             expanded = isGSTDropDownMenuExpanded,
@@ -202,30 +221,11 @@ fun CreateInvoice(navController: NavController) {
             }
         }
 
-        AppField(
-            modifier = Modifier
-                .constrainAs(refFieldUnitPrice) {
-                    start.linkTo(parent.start)
-                    top.linkTo(refDropDownQty.bottom, Dimen.dimen20)
-                    end.linkTo(refTxtTotalAmount.start)
-                    width = Dimension.fillToConstraints
-                },
-            value = unitPrice,
-            onValueChange = {
-                unitPrice = it
-                unitPriceError = ""
-            },
-            hint = stringResource(id = R.string.price),
-            errorMsg = unitPriceError,
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        )
-
 
         OutlinedTextField(
             modifier = Modifier
                 .constrainAs(refTxtTotalAmount) {
-                    start.linkTo(refFieldUnitPrice.end, Dimen.dimen20)
+                    start.linkTo(refDropDownGST.end, Dimen.dimen20)
                     top.linkTo(refDropDownQty.bottom, Dimen.dimen20)
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
@@ -254,7 +254,7 @@ fun CreateInvoice(navController: NavController) {
         AppButton(modifier = Modifier
             .constrainAs(refBtnAdd){
                 start.linkTo(parent.start)
-                top.linkTo(refFieldUnitPrice.bottom, Dimen.dimen20)
+                top.linkTo(refTxtTotalAmount.bottom, Dimen.dimen20)
                 end.linkTo(parent.end)
                 width = Dimension.fillToConstraints
             }, txt = stringResource(id = R.string.add)) {
