@@ -1,20 +1,22 @@
-package com.simple.invoice.data.model
+package com.simple.invoice.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 
-@Entity(foreignKeys = [
+@Entity(
+    tableName = "invoice_items",
+    foreignKeys = [
     ForeignKey(
-        entity = Invoice::class,
+        entity = InvoiceEntity::class,
         parentColumns = ["id"],
         childColumns = ["invoiceId"],
         onUpdate = ForeignKey.CASCADE,
         onDelete = ForeignKey.CASCADE
     )
 ])
-data class InvoiceItems(
+data class InvoiceItemsEntity(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     val invoiceId: Int,
     val item: String,

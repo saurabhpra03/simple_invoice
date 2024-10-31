@@ -4,11 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.simple.invoice.data.dao.AuthDao
-import com.simple.invoice.data.dao.InvoiceDao
-import com.simple.invoice.data.model.Auth
+import com.simple.invoice.data.db.dao.AuthDao
+import com.simple.invoice.data.db.dao.InvoiceDao
+import com.simple.invoice.data.db.entity.AuthEntity
 
-@Database(entities = [Auth::class], version = 1)
+@Database(entities = [AuthEntity::class], version = 1)
 abstract class MyAppDB : RoomDatabase() {
 
     abstract fun authDao(): AuthDao

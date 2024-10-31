@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simple.invoice.R
 import com.simple.invoice.data.Resource
-import com.simple.invoice.data.model.Auth
+import com.simple.invoice.data.db.entity.AuthEntity
 import com.simple.invoice.data.networking.CoroutineDispatcherProvider
 import com.simple.invoice.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,13 +23,13 @@ class AuthViewModel @Inject constructor(
     private val coroutineDispatcherProvider: CoroutineDispatcherProvider
 ) : ViewModel() {
 
-    private val _signUpFlow = MutableStateFlow<Resource<Auth>?>(null)
-    val signUpFlow: StateFlow<Resource<Auth>?> get() = _signUpFlow
+    private val _signUpFlow = MutableStateFlow<Resource<AuthEntity>?>(null)
+    val signUpFlow: StateFlow<Resource<AuthEntity>?> get() = _signUpFlow
 
-    private val _loginFlow = MutableStateFlow<Resource<Auth>?>(null)
-    val loginFlow: StateFlow<Resource<Auth>?> get() = _loginFlow
+    private val _loginFlow = MutableStateFlow<Resource<AuthEntity>?>(null)
+    val loginFlow: StateFlow<Resource<AuthEntity>?> get() = _loginFlow
 
-    fun signUp(auth: Auth) {
+    fun signUp(auth: AuthEntity) {
         _signUpFlow.value = Resource.Loading
         viewModelScope.launch(coroutineDispatcherProvider.IO()) {
             try {
@@ -57,7 +57,7 @@ class AuthViewModel @Inject constructor(
         _loginFlow.value = Resource.Loading
         viewModelScope.launch(coroutineDispatcherProvider.IO()) {
             try {
-                val response: Auth? = repository.login(emailId, password)
+                val response: AuthEntity? = repository.login(emailId, password)
                 response?.let {
                     _loginFlow.value = Resource.Success(it)
                 } ?: run {

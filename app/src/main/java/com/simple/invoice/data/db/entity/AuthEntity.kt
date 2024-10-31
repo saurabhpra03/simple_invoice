@@ -1,11 +1,11 @@
-package com.simple.invoice.data.model
+package com.simple.invoice.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(indices = [Index(value = ["emailId"], unique = true)])
-data class Auth(
+@Entity(tableName = "auth", indices = [Index(value = ["emailId"], unique = true)])
+data class AuthEntity(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     val name: String,
     val emailId: String,

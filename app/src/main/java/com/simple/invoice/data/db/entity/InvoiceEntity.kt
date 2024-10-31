@@ -1,17 +1,17 @@
-package com.simple.invoice.data.model
+package com.simple.invoice.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(foreignKeys = [
+@Entity(tableName = "invoice", foreignKeys = [
     ForeignKey(
-        entity = Auth::class,
+        entity = AuthEntity::class,
         parentColumns = ["id"],
         childColumns = ["authID"],
     )
 ])
-data class Invoice(
+data class InvoiceEntity(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     val authId: Int,
     val invoiceNo: String,

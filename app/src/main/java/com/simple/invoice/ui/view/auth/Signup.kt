@@ -27,7 +27,7 @@ import com.simple.invoice.common.AppButton
 import com.simple.invoice.common.AppField
 import com.simple.invoice.common.AppLoader
 import com.simple.invoice.data.Resource
-import com.simple.invoice.data.model.Auth
+import com.simple.invoice.data.db.entity.AuthEntity
 import com.simple.invoice.ui.theme.Black
 import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.utils.Screens
@@ -139,7 +139,7 @@ fun SignupScreen(
                 name.trim().isEmpty() -> nameError = context.getString(R.string.empty_name)
                 email.isNotEmpty() -> emailIdError = email
                 pwd.isNotEmpty() -> passwordError = pwd
-                else -> viewModel.signUp(Auth(name = name.trim(), emailId = emailId.trim(), password = password.trim()))
+                else -> viewModel.signUp(AuthEntity(name = name.trim(), emailId = emailId.trim(), password = password.trim()))
             }
         }
 
