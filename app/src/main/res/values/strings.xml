@@ -27,4 +27,5 @@
     <string name="qty">Qty</string>
     <string name="total_amount">Total Amount</string>
     <string name="add">Add</string>
+    <string name="generate_invoice">Generate Invoice</string>
 </resources>

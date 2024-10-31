@@ -24,4 +24,39 @@ object Constants {
 
     fun Context.toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 
+    fun calculateTotalAmount(quantity: Int, price: Double, gstRate: Int): String {
+
+        val baseAmount = price * quantity
+        val gstAmount = (baseAmount * gstRate) / 100
+        val finalAmount = baseAmount + gstAmount
+
+        return getValidatedNumber(finalAmount.toString())
+    }
+
+    /**
+     * Filters a given numeric string to ensure:
+     * - Only the first decimal point is allowed.
+     * - At most three digits before the decimal and two digits after are retained.
+     *
+     * @param value The original numeric string input.
+     * @return The validated and formatted numeric string.
+     */
+    fun getValidatedNumber(input: String): String {
+        // Remove unwanted characters, allowing only digits and a single decimal point
+        val filteredChars = input.filterIndexed { index, char ->
+            char.isDigit() || (char == '.' && input.indexOf('.') == index)  // Only take first decimal point
+        }
+
+        // Ensure the final string meets the digit limit requirements
+        return if (filteredChars.contains('.')) {
+            val beforeDecimal = filteredChars.substringBefore('.')
+            val afterDecimal = filteredChars.substringAfter('.')
+            "${beforeDecimal.take(7)}.${afterDecimal.take(2)}"   // Limit: 3 digits before, 2 digits after decimal
+        } else {
+            filteredChars.take(7)  // No decimal point: only take up to 3 digits
+        }
+    }
+
+
+
 }
