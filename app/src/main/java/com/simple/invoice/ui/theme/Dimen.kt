@@ -25,6 +25,8 @@ object Dimen {
 
     val txt12: TextUnit = 12.sp
     val txt13: TextUnit = 13.sp
+    val txt15: TextUnit = 15.sp
+    val txt17: TextUnit = 17.sp
 
     val fieldTxtSize = txt13
     val errorTxtSize = txt12

@@ -27,5 +27,13 @@
     <string name="qty">Qty</string>
     <string name="total_amount">Total Amount</string>
     <string name="add">Add</string>
+    <string name="next">Next</string>
     <string name="generate_invoice">Generate Invoice</string>
+    <string name="extra_charges">Extra charges</string>
+    <string name="none">None</string>
+    <string name="percentage_symbol">%</string>
+    <string name="discount_type">Discount type:</string>
+    <string name="discount">Discount</string>
+    <string name="empty_discount">Please enter discount.</string>
+    <string name="sub_total">SubTotal</string>
 </resources>

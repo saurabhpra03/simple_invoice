@@ -24,13 +24,8 @@ object Constants {
 
     fun Context.toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 
-    fun calculateTotalAmount(quantity: Int, price: Double, gstRate: Int): String {
-
-        val baseAmount = price * quantity
-        val gstAmount = (baseAmount * gstRate) / 100
-        val finalAmount = baseAmount + gstAmount
-
-        return getValidatedNumber(finalAmount.toString())
+    fun calculateItemTotalAmount(quantity: Int, price: Double): String{
+        return getValidatedNumber((price * quantity).toString())
     }
 
     /**

@@ -17,6 +17,7 @@ data class InvoiceEntity(
     val invoiceNo: String,
     val date: Long,
     val subTotal: Double,
+    val gst: String,
     val extraCharges: Double,
     val discount: Double,
     val totalAmount: Double,

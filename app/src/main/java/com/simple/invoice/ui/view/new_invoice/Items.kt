@@ -32,7 +32,7 @@ import com.simple.invoice.utils.Constants
 @Composable
 fun Items(
     modifier: Modifier,
-    list: MutableList<InvoiceDto>
+    list: MutableList<InvoiceDto>,
 ){
     LazyColumn(
         modifier = modifier
@@ -41,7 +41,7 @@ fun Items(
             count = list.size
         ){ index ->
             val invoiceDto = list[index]
-            val itemTotalAmount = Constants.calculateTotalAmount(invoiceDto.qty, invoiceDto.unitPrice.toDouble(), invoiceDto.gst.replace("%", "").toInt())
+            val itemTotalAmount = Constants.calculateItemTotalAmount(invoiceDto.qty, invoiceDto.unitPrice.toDouble())
 
             ElevatedCard(
                 modifier = Modifier
@@ -61,7 +61,7 @@ fun Items(
                         .fillMaxSize()
                         .padding(dimen7)
                 ) {
-                    val (refItem, refQty, refUnitPrice, refGST, refTotalAmount) = createRefs()
+                    val (refItem, refQty, refUnitPrice, refTotalAmount) = createRefs()
 
                     Text(
                         modifier = Modifier
@@ -104,21 +104,6 @@ fun Items(
                                 end.linkTo(parent.end)
                             },
                         text = "${stringResource(R.string.price)}: ${stringResource(R.string.ruppe_symbol)}${invoiceDto.unitPrice}",
-                        style = TextStyle(
-                            fontSize = txt12,
-                            fontWeight = FontWeight.Normal,
-                            fontStyle = FontStyle.Normal,
-                            color = Black
-                        )
-                    )
-
-                    Text(
-                        modifier = Modifier
-                            .constrainAs(refGST){
-                                start.linkTo(parent.start)
-                                bottom.linkTo(parent.bottom)
-                            },
-                        text = "${stringResource(R.string.gst)}: ${invoiceDto.gst}",
                         style = TextStyle(
                             fontSize = txt12,
                             fontWeight = FontWeight.Normal,

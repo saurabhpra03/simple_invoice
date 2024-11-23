@@ -5,6 +5,5 @@ data class InvoiceDto(
     val item: String,
     val qty: Int,
     val unitPrice: String,
-    val gst: String,
     val totalAmount: String
 )

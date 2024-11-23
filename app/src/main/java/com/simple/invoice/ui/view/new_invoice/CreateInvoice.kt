@@ -3,16 +3,13 @@ package com.simple.invoice.ui.view.new_invoice
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,6 +37,7 @@ import com.simple.invoice.common.AppField
 import com.simple.invoice.data.module.InvoiceDto
 import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.ui.theme.Dimen.dimen15
+import com.simple.invoice.ui.theme.Dimen.dimen17
 import com.simple.invoice.ui.theme.Dimen.dimen20
 import com.simple.invoice.ui.theme.Dimen.dimen30
 import com.simple.invoice.utils.Constants
@@ -64,23 +62,20 @@ fun CreateInvoice(navController: NavController) {
     var unitPrice by remember { mutableStateOf("") }
     var unitPriceError by remember { mutableStateOf("") }
 
-    // List of available GST rates and selected GST state
-    val gstList = listOf("0%", "5%", "12%", "18%", "28%")
-    var selectedGST by remember { mutableStateOf(gstList[0]) }
-    var isGSTDropDownMenuExpanded by remember { mutableStateOf(false) }
-
     // Computed total amount for the item
     var totalAmount by remember { mutableStateOf("0.00") }
+
+    var subTotal by remember { mutableStateOf("0.00") }
 
     // List to hold the current invoice items
     val invoiceList = remember { mutableStateListOf<InvoiceDto>() }
 
-    val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet = remember { mutableStateOf(false) }
+
+    val showBottomSheet = remember { mutableStateOf(false) }
 
     fun updateTotalAmount(){
         totalAmount = if (unitPrice.trim().isNotEmpty() && unitPrice.toDouble() > 0){
-            Constants.calculateTotalAmount(selectedQty,unitPrice.toDouble(), selectedGST.replace("%", "").toInt())
+            Constants.calculateItemTotalAmount(selectedQty,unitPrice.toDouble())
         }else{
             "0.00"
         }
@@ -88,18 +83,10 @@ fun CreateInvoice(navController: NavController) {
     }
 
     if (showBottomSheet.value){
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheet.value = false  },
-            sheetState = sheetState
-        ) {
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                val (refFieldName, refDate, refTxtSubTotal, refFieldExtraCharges, refFieldDiscount) = createRefs()
-            }
-        }
+        GenerateInvoice(
+            showBottomSheet = showBottomSheet,
+            subTotal = subTotal
+        )
     }
 
 
@@ -108,7 +95,7 @@ fun CreateInvoice(navController: NavController) {
             .fillMaxSize()
     ) {
 
-        val (refFieldItem, refDropDownQty, refFieldUnitPrice, refDropDownGST, refTxtTotalAmount, refBtnAdd, refItems, refBtnGenerate) = createRefs()
+        val (refFieldItem, refDropDownQty, refFieldUnitPrice, refTxtTotalAmount, refBtnAdd, refItems, refBtnNext) = createRefs()
 
         AppField(
             modifier = Modifier
@@ -195,8 +182,8 @@ fun CreateInvoice(navController: NavController) {
         AppField(
             modifier = Modifier
                 .constrainAs(refFieldUnitPrice) {
-                    start.linkTo(refDropDownQty.end, Dimen.dimen15)
-                    top.linkTo(refFieldItem.bottom, Dimen.dimen17)
+                    start.linkTo(refDropDownQty.end, dimen15)
+                    top.linkTo(refFieldItem.bottom, dimen17)
                     end.linkTo(parent.end, dimen30)
                     width = Dimension.fillToConstraints
                 },
@@ -213,95 +200,20 @@ fun CreateInvoice(navController: NavController) {
             imeAction = ImeAction.Done
         )
 
-        ExposedDropdownMenuBox(
-            modifier = Modifier
-                .constrainAs(refDropDownGST) {
-                    start.linkTo(parent.start, dimen30)
-                    top.linkTo(refDropDownQty.bottom, dimen20)
-                    end.linkTo(refTxtTotalAmount.start)
-                    width = Dimension.fillToConstraints
-                },
-            expanded = isGSTDropDownMenuExpanded,
-            onExpandedChange = { isGSTDropDownMenuExpanded = !isGSTDropDownMenuExpanded }) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
-                readOnly = true,
-                value = selectedGST,
-                onValueChange = {},
-                label = {
-                    Text(
-                        text = stringResource(id = R.string.gst),
-                        style = TextStyle(
-                            fontSize = Dimen.fieldTxtSize,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal
-                        )
-                    )
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isGSTDropDownMenuExpanded)
-                },
-            )
-
-            ExposedDropdownMenu(
-                modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
-                expanded = isGSTDropDownMenuExpanded,
-                onDismissRequest = { isGSTDropDownMenuExpanded = false }) {
-                gstList.forEach { gst ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = gst,
-                                style = TextStyle(
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = Dimen.txt13,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                            )
-                        },
-                        onClick = {
-                            isGSTDropDownMenuExpanded = false
-                            selectedGST = gst
-
-                            updateTotalAmount()
-                        }
-                    )
-
-                }
-            }
-        }
-
-
-        OutlinedTextField(
+        Text(
             modifier = Modifier
                 .constrainAs(refTxtTotalAmount) {
-                    start.linkTo(refDropDownGST.end, dimen20)
                     top.linkTo(refDropDownQty.bottom, dimen20)
                     end.linkTo(parent.end, dimen30)
-                    width = Dimension.fillToConstraints
                 },
-            value = "${stringResource(id = R.string.ruppe_symbol)}$totalAmount",
-            onValueChange = {},
-            readOnly = true,
-            label = {
-                Text(
-                    text = stringResource(id = R.string.total_amount),
-                    style = TextStyle(
-                        fontSize = Dimen.fieldTxtSize,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Normal
-                    )
-                )
-            },
-            maxLines = 1,
-            textStyle = TextStyle(
-                fontSize = Dimen.fieldTxtSize,
+            text = "${stringResource(id = R.string.ruppe_symbol)}$totalAmount",
+            style = TextStyle(
+                fontSize = Dimen.txt17,
                 fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Normal
-            )
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.primary
+            ),
+            maxLines = 1
         )
 
         AppButton(modifier = Modifier
@@ -319,14 +231,22 @@ fun CreateInvoice(navController: NavController) {
                 else -> {
                     // Add item to the list
                     val id = if(invoiceList.size > 0) invoiceList[invoiceList.size - 1].id + 1 else 1
-                    val newInvoice = InvoiceDto(id = id, item = item.trim(), qty = selectedQty, unitPrice = Constants.getValidatedNumber(unitPrice), gst = selectedGST, totalAmount = Constants.getValidatedNumber(totalAmount))
+                    val newInvoice = InvoiceDto(id = id, item = item.trim(), qty = selectedQty, unitPrice = Constants.getValidatedNumber(unitPrice), totalAmount = Constants.getValidatedNumber(totalAmount))
                     invoiceList.add(newInvoice)
+
+                    subTotal = ""
+                    invoiceList.forEach {
+                        subTotal = if (subTotal.trim().isEmpty()){
+                            Constants.getValidatedNumber(it.totalAmount.toDouble().toString())
+                        }else {
+                            Constants.getValidatedNumber((subTotal.toDouble() + it.totalAmount.toDouble()).toString())
+                        }
+                    }
 
                     // Reset all fields
                     item = ""
                     selectedQty = qtyList[0]
                     unitPrice = ""
-                    selectedGST = gstList[0]
                     totalAmount = "0.00"
                 }
             }
@@ -338,21 +258,24 @@ fun CreateInvoice(navController: NavController) {
                 start.linkTo(parent.start, dimen30)
                 top.linkTo(refBtnAdd.bottom, dimen15)
                 end.linkTo(parent.end, dimen30)
-                bottom.linkTo(refBtnGenerate.top, dimen20)
+                bottom.linkTo(refBtnNext.top, dimen20)
                 width = Dimension.fillToConstraints
                 height = Dimension.fillToConstraints
             },
             list = invoiceList)
 
         if (invoiceList.isNotEmpty()){
-            GenerateInvoice(
+            AppButton(
                 modifier = Modifier
-                    .constrainAs(refBtnGenerate){
-                        start.linkTo(parent.start)
+                    .constrainAs(refBtnNext){
+                        start.linkTo(parent.start, dimen30)
                         end.linkTo(parent.end, dimen30)
                         bottom.linkTo(parent.bottom)
-                        width = Dimension.fillToConstraints}
-            )
+                        width = Dimension.fillToConstraints},
+                txt = "${stringResource(R.string.ruppe_symbol)}$subTotal => ${stringResource(R.string.next)}"
+            ) {
+                showBottomSheet.value = true
+            }
         }
 
 
