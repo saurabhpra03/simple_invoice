@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.navigation.NavController
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 object Constants {
 
@@ -39,19 +41,24 @@ object Constants {
     fun getValidatedNumber(input: String): String {
         // Remove unwanted characters, allowing only digits and a single decimal point
         val filteredChars = input.filterIndexed { index, char ->
-            char.isDigit() || (char == '.' && input.indexOf('.') == index)  // Only take first decimal point
+            char.isDigit() || (char == '.' && input.indexOf('.') == index)  // Only take the first decimal point
         }
 
-        // Ensure the final string meets the digit limit requirements
+        // If the filtered input contains a decimal point, process the decimal part
         return if (filteredChars.contains('.')) {
             val beforeDecimal = filteredChars.substringBefore('.')
             val afterDecimal = filteredChars.substringAfter('.')
-            "${beforeDecimal.take(7)}.${afterDecimal.take(2)}"   // Limit: 3 digits before, 2 digits after decimal
+
+            // Combine before and after decimal parts with proper rounding
+            val number = BigDecimal("$beforeDecimal.$afterDecimal")
+            val roundedNumber = number.setScale(2, RoundingMode.HALF_UP)  // Round to 2 decimal places, rounding half up
+
+            // Return the formatted result
+            roundedNumber.toString()
         } else {
-            filteredChars.take(7)  // No decimal point: only take up to 3 digits
+            // No decimal point: only take up to 7 digits
+            filteredChars.take(7)
         }
     }
-
-
 
 }
