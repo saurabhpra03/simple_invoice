@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.DropdownMenuItem
@@ -34,14 +33,12 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.simple.invoice.R
 import com.simple.invoice.common.AppField
 import com.simple.invoice.ui.theme.Black
 import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.ui.theme.Dimen.dimen17
-import com.simple.invoice.ui.theme.Dimen.dimen20
 import com.simple.invoice.ui.theme.Dimen.dimen3
 import com.simple.invoice.ui.theme.Dimen.dimen30
 import com.simple.invoice.ui.theme.Dimen.dimen7
@@ -49,50 +46,22 @@ import com.simple.invoice.ui.theme.Dimen.txt13
 import com.simple.invoice.ui.theme.Dimen.txt15
 import com.simple.invoice.ui.theme.Dimen.txt17
 import com.simple.invoice.ui.theme.LightGrey
+import com.simple.invoice.ui.viewModel.GenerateInvoiceViewModel
 import com.simple.invoice.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenerateInvoice(
+    viewModel: GenerateInvoiceViewModel = hiltViewModel(),
     showBottomSheet: MutableState<Boolean>,
-    subTotal: String,
+    initialSubTotal: String,
 ) {
+    viewModel.subTotal = initialSubTotal
 
     val sheetState = rememberModalBottomSheetState()
 
-    var name = remember { mutableStateOf("") }
-    var nameError = remember { mutableStateOf("") }
-
-    // List of available GST rates and selected GST state
-    val gstList = listOf("0%", "5%", "12%", "18%", "28%")
-    var selectedGST by remember { mutableStateOf(gstList[0]) }
     var isGSTDropDownMenuExpanded by remember { mutableStateOf(false) }
-    var gst by remember { mutableStateOf("0.00") }
-
-    var extraCharges = remember { mutableStateOf("") }
-
-    val discountOptions = listOf(stringResource(R.string.none), stringResource(R.string.ruppe_symbol), stringResource(R.string.percentage_symbol))
-    val selectedDiscountOption = remember { mutableStateOf(discountOptions[0]) }
-    var discount = remember { mutableStateOf("") }
-    var discountAmount = remember { mutableStateOf("0.00") }
-
-    fun calculateGST(){
-        if (selectedGST != gstList[0]){
-            gst = Constants.getValidatedNumber(((subTotal.toDouble() * selectedGST.replace("%", "").toInt())/100).toString())
-        }
-    }
-
-    fun calculateDiscount(){
-        discountAmount.value = when(selectedDiscountOption.value){
-            discountOptions[0] -> "0.0"
-            discountOptions[1] -> Constants.getValidatedNumber(discount.value)
-            else -> {
-                Constants.getValidatedNumber((subTotal.toDouble() * (discount.value.toDouble() / 100.0)).toString())
-            }
-        }
-    }
-
-
+    val discountError = remember { mutableStateOf("") }
 
     ModalBottomSheet(
         modifier = Modifier.fillMaxHeight(),
@@ -110,13 +79,13 @@ fun GenerateInvoice(
             AppField(
                 modifier = Modifier
                     .fillMaxWidth(),
-                value = name.value,
+                value = viewModel.name,
                 onValueChange = {
-                    name.value = it
-                    nameError.value = ""
+                    viewModel.name = it
+                    viewModel.nameError = ""
                 },
                 hint = stringResource(R.string.name),
-                errorMsg = nameError.value,
+                errorMsg = viewModel.nameError,
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
             )
@@ -132,7 +101,7 @@ fun GenerateInvoice(
                         .menuAnchor()
                         .fillMaxWidth(),
                     readOnly = true,
-                    value = selectedGST,
+                    value = viewModel.selectedGST,
                     onValueChange = {},
                     label = {
                         Text(
@@ -153,7 +122,7 @@ fun GenerateInvoice(
                     modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
                     expanded = isGSTDropDownMenuExpanded,
                     onDismissRequest = { isGSTDropDownMenuExpanded = false }) {
-                    gstList.forEach { gst ->
+                    viewModel.gstList.forEach { gst ->
                         DropdownMenuItem(
                             text = {
                                 Text(
@@ -168,8 +137,8 @@ fun GenerateInvoice(
                             },
                             onClick = {
                                 isGSTDropDownMenuExpanded = false
-                                selectedGST = gst
-                                calculateGST()
+                                viewModel.selectedGST = gst
+                                viewModel.calculateGST()
                             }
                         )
 
@@ -181,9 +150,10 @@ fun GenerateInvoice(
                 modifier = Modifier
                     .padding(top = dimen17)
                     .fillMaxWidth(),
-                value = extraCharges.value,
+                value = viewModel.extraCharges,
                 onValueChange = {
-                    extraCharges.value = Constants.getValidatedNumber(it.trim())
+                    viewModel.extraCharges = Constants.getValidatedNumber(it.trim())
+                    viewModel.calculateTotalAmount()
                 },
                 hint = stringResource(R.string.extra_charges),
                 errorMsg = "",
@@ -209,7 +179,7 @@ fun GenerateInvoice(
                     )
                 )
 
-                discountOptions.forEach { options ->
+                viewModel.discountOptions.forEach { options ->
                     Row(
                         modifier = Modifier
                             .padding(end = dimen7),
@@ -217,48 +187,48 @@ fun GenerateInvoice(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         RadioButton(
-                            selected = selectedDiscountOption.value == options,
+                            selected = viewModel.selectedDiscountOption == options,
                             onClick = {
-                                selectedDiscountOption.value = options
-                                discount.value = ""
+                                viewModel.selectedDiscountOption = options
+                                viewModel.discount = ""
+                                viewModel.discountAmount = "0.00"
                             }
                         )
 
                         Text(
-                            text = options,
+                            text = stringResource(options),
                             style = TextStyle(
                                 fontStyle = FontStyle.Normal,
                                 fontWeight = FontWeight.Normal,
                                 fontSize = txt13,
-                                color = if(selectedDiscountOption.value == options) MaterialTheme.colorScheme.primary else Black
+                                color = if(viewModel.selectedDiscountOption == options) MaterialTheme.colorScheme.primary else Black
                             )
                         )
                     }
                 }
             }
 
-            if (selectedDiscountOption.value != stringResource(R.string.none)){
-                val discountSymbol = if(selectedDiscountOption.value == stringResource(R.string.ruppe_symbol)) stringResource(R.string.ruppe_symbol) else stringResource(R.string.percentage_symbol)
+            if (viewModel.selectedDiscountOption != viewModel.discountOptions[0]){
+                val discountSymbol = if(viewModel.selectedDiscountOption == viewModel.discountOptions[1]) stringResource(R.string.ruppe_symbol) else stringResource(R.string.percentage_symbol)
                 AppField(
                     modifier = Modifier
                         .padding(top = dimen17)
                         .fillMaxWidth(),
-                    value = discount.value,
+                    value = viewModel.discount,
                     onValueChange = {
                         if (it.trim().isNotEmpty()){
                             val validInput = Constants.getValidatedNumber(it)
 
-                            discount.value = if (discountSymbol == "%" && validInput.toDouble() in 0.0..100.0){
+                            viewModel.discount = if (discountSymbol == "%" && validInput.toDouble() in 0.0..100.0){
                                 validInput
                             }else{
                                 validInput
                             }
-
-                            calculateDiscount()
+                            viewModel.calculateDiscount()
                         }
                     },
                     hint = stringResource(R.string.discount),
-                    errorMsg = stringResource(R.string.empty_discount),
+                    errorMsg = discountError.value,
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
                 )
@@ -287,7 +257,7 @@ fun GenerateInvoice(
                         )
                     )
                     Text(
-                        text = stringResource(R.string.gst) + if(selectedDiscountOption.value == discountOptions[1]) "($selectedGST)" else ""+":",
+                        text = stringResource(R.string.gst) + "(${viewModel.selectedGST}):",
                         style = TextStyle(
                             fontSize = txt15,
                             fontStyle = FontStyle.Normal,
@@ -303,7 +273,7 @@ fun GenerateInvoice(
                         )
                     )
                     Text(
-                        text = "${stringResource(R.string.discount)}:",
+                        text = if (viewModel.selectedDiscountOption == viewModel.discountOptions[2]) "${stringResource(R.string.discount)}(${viewModel.discount}%):" else "${stringResource(R.string.discount)}:",
                         style = TextStyle(
                             fontSize = txt15,
                             fontStyle = FontStyle.Normal,
@@ -314,7 +284,7 @@ fun GenerateInvoice(
 
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "${stringResource(R.string.ruppe_symbol)}$subTotal",
+                        text = "${stringResource(R.string.ruppe_symbol)}${viewModel.subTotal}",
                         style = TextStyle(
                             fontSize = txt15,
                             fontStyle = FontStyle.Normal,
@@ -322,7 +292,7 @@ fun GenerateInvoice(
                         )
                     )
                     Text(
-                        text = "${stringResource(R.string.ruppe_symbol)}$gst",
+                        text = "${stringResource(R.string.ruppe_symbol)}${viewModel.gstAmount}",
                         style = TextStyle(
                             fontSize = txt15,
                             fontStyle = FontStyle.Normal,
@@ -330,7 +300,7 @@ fun GenerateInvoice(
                         )
                     )
                     Text(
-                        text = "${stringResource(R.string.ruppe_symbol)}${extraCharges.value.ifEmpty { "0.00" }}",
+                        text = "${stringResource(R.string.ruppe_symbol)}${viewModel.extraCharges.ifEmpty { "0.00" }}",
                         style = TextStyle(
                             fontSize = txt15,
                             fontStyle = FontStyle.Normal,
@@ -338,7 +308,7 @@ fun GenerateInvoice(
                         )
                     )
                     Text(
-                        text = "${stringResource(R.string.ruppe_symbol)}${discountAmount.value}",
+                        text = "${stringResource(R.string.ruppe_symbol)}${viewModel.discountAmount}",
                         style = TextStyle(
                             fontSize = txt15,
                             fontStyle = FontStyle.Normal,
@@ -372,7 +342,7 @@ fun GenerateInvoice(
                 )
 
                 Text(
-                    text = "${stringResource(R.string.ruppe_symbol)}$subTotal",
+                    text = "${stringResource(R.string.ruppe_symbol)}${viewModel.totalAmount}",
                     style = TextStyle(
                         fontSize = txt17,
                         fontStyle = FontStyle.Normal,

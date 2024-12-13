@@ -85,7 +85,7 @@ fun CreateInvoice(navController: NavController) {
     if (showBottomSheet.value){
         GenerateInvoice(
             showBottomSheet = showBottomSheet,
-            subTotal = subTotal
+            initialSubTotal = subTotal
         )
     }
 
