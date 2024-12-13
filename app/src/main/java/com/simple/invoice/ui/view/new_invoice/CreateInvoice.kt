@@ -41,6 +41,7 @@ import com.simple.invoice.ui.theme.Dimen.dimen17
 import com.simple.invoice.ui.theme.Dimen.dimen20
 import com.simple.invoice.ui.theme.Dimen.dimen30
 import com.simple.invoice.utils.Constants
+import com.simple.invoice.utils.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,8 +72,6 @@ fun CreateInvoice(navController: NavController) {
     val invoiceList = remember { mutableStateListOf<InvoiceDto>() }
 
 
-    val showBottomSheet = remember { mutableStateOf(false) }
-
     fun updateTotalAmount(){
         totalAmount = if (unitPrice.trim().isNotEmpty() && unitPrice.toDouble() > 0){
             Constants.calculateItemTotalAmount(selectedQty,unitPrice.toDouble())
@@ -80,13 +79,6 @@ fun CreateInvoice(navController: NavController) {
             "0.00"
         }
 
-    }
-
-    if (showBottomSheet.value){
-        GenerateInvoice(
-            showBottomSheet = showBottomSheet,
-            initialSubTotal = subTotal
-        )
     }
 
 
@@ -274,7 +266,11 @@ fun CreateInvoice(navController: NavController) {
                         width = Dimension.fillToConstraints},
                 txt = "${stringResource(R.string.ruppe_symbol)}$subTotal => ${stringResource(R.string.next)}"
             ) {
-                showBottomSheet.value = true
+                navController.navigate(Screens.Home.GenerateInvoice.route+"/"+subTotal){
+                    popUpTo(Screens.Home.CreateInvoice.route){
+                        inclusive = true
+                    }
+                }
             }
         }
 
