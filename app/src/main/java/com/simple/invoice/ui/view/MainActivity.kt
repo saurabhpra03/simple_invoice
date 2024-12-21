@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -31,22 +32,22 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+
+
         setContent {
 
             val navController = rememberNavController()
 
             SimpleInvoiceTheme(darkTheme = false) {
-                Scaffold(
+                Surface(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color = MaterialTheme.colorScheme.background)
-                ) { innerPadding ->
-
+                ) {
                     NavHost(
                         navController = navController,
-                        startDestination = Screens.Home.CreateInvoice.route,
-                        modifier = Modifier.padding(innerPadding)
+                        startDestination = Screens.Home.CreateInvoice.route
                     ) {
 
                         composable(Screens.Home.CreateInvoice.route) {
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
 
 
                         composable(
-                            route = Screens.Home.GenerateInvoice.route,
+                            route = Screens.Home.GenerateInvoice.route+"/{sub_total}",
                             arguments = listOf(navArgument("sub_total") {
                                 type = NavType.StringType
                             })

@@ -3,12 +3,17 @@ package com.simple.invoice.ui.view.new_invoice
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,7 +21,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,10 +40,7 @@ import com.simple.invoice.common.AppButton
 import com.simple.invoice.common.AppField
 import com.simple.invoice.data.module.InvoiceDto
 import com.simple.invoice.ui.theme.Dimen
-import com.simple.invoice.ui.theme.Dimen.dimen15
-import com.simple.invoice.ui.theme.Dimen.dimen17
-import com.simple.invoice.ui.theme.Dimen.dimen20
-import com.simple.invoice.ui.theme.Dimen.dimen30
+import com.simple.invoice.ui.theme.LightGrey
 import com.simple.invoice.utils.Constants
 import com.simple.invoice.utils.Screens
 
@@ -48,7 +49,6 @@ import com.simple.invoice.utils.Screens
 fun CreateInvoice(navController: NavController) {
 
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
     // Item description and validation error message
     var item by remember { mutableStateOf("") }
@@ -81,201 +81,234 @@ fun CreateInvoice(navController: NavController) {
 
     }
 
-
-    ConstraintLayout(
+    Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-    ) {
-
-        val (refFieldItem, refDropDownQty, refFieldUnitPrice, refTxtTotalAmount, refBtnAdd, refItems, refBtnNext) = createRefs()
-
-        AppField(
-            modifier = Modifier
-                .constrainAs(refFieldItem) {
-                    start.linkTo(parent.start, dimen30)
-                    top.linkTo(parent.top, dimen30)
-                    end.linkTo(parent.end, dimen30)
-                    width = Dimension.fillToConstraints
-                },
-            value = item,
-            onValueChange = {
-                item = it
-                itemError = ""
-            },
-            hint = stringResource(id = R.string.description_of_item),
-            errorMsg = itemError,
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Done
-        )
-
-        ExposedDropdownMenuBox(
-            modifier = Modifier
-                .constrainAs(refDropDownQty) {
-                    start.linkTo(parent.start, dimen30)
-                    top.linkTo(refFieldItem.bottom, Dimen.dimen17)
-                    end.linkTo(refFieldUnitPrice.start)
-                    width = Dimension.fillToConstraints
-                },
-            expanded = isQtyDropDownMenuExpanded,
-            onExpandedChange = { isQtyDropDownMenuExpanded = !isQtyDropDownMenuExpanded }) {
-
-            OutlinedTextField(
+            .fillMaxSize(),
+        topBar = {
+            CenterAlignedTopAppBar(
                 modifier = Modifier
-                    .menuAnchor()
                     .fillMaxWidth(),
-                readOnly = true,
-                value = "$selectedQty",
-                onValueChange = {},
-                label = {
-                    Text(
-                        text = stringResource(id = R.string.qty),
+                title = {
+                    Text("Add Invoice Items",
                         style = TextStyle(
-                            fontSize = Dimen.fieldTxtSize,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal
+                            fontSize = Dimen.txt17,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
                         )
                     )
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isQtyDropDownMenuExpanded)
-                },
+                }
+            )
+        }
+    ) { innerPadding ->
+        ConstraintLayout(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+
+            val (refTopBarDivider, refFieldItem, refDropDownQty, refFieldUnitPrice, refTxtTotalAmount, refBtnAdd, refItems, refBtnNext) = createRefs()
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .constrainAs(refTopBarDivider){
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                        width = Dimension.fillToConstraints
+                    }
+                    .height(Dimen.dimen1),
+                color = LightGrey
             )
 
-            ExposedDropdownMenu(
-                modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
-                expanded = isQtyDropDownMenuExpanded,
-                onDismissRequest = { isQtyDropDownMenuExpanded = false }) {
-                qtyList.forEach { qty ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = "$qty",
-                                style = TextStyle(
-                                    fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = Dimen.txt13,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                            )
-                        },
-                        onClick = {
-                            isQtyDropDownMenuExpanded = false
-                            selectedQty = qty
-
-                            updateTotalAmount()
-                        }
-                    )
-
-                }
-            }
-
-        }
-
-        AppField(
-            modifier = Modifier
-                .constrainAs(refFieldUnitPrice) {
-                    start.linkTo(refDropDownQty.end, dimen15)
-                    top.linkTo(refFieldItem.bottom, dimen17)
-                    end.linkTo(parent.end, dimen30)
-                    width = Dimension.fillToConstraints
-                },
-            value = unitPrice,
-            onValueChange = {
-                unitPrice = Constants.getValidatedNumber(it)
-                unitPriceError = ""
-
-                updateTotalAmount()
-            },
-            hint = stringResource(id = R.string.price),
-            errorMsg = unitPriceError,
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        )
-
-        Text(
-            modifier = Modifier
-                .constrainAs(refTxtTotalAmount) {
-                    top.linkTo(refDropDownQty.bottom, dimen20)
-                    end.linkTo(parent.end, dimen30)
-                },
-            text = "${stringResource(id = R.string.ruppe_symbol)}$totalAmount",
-            style = TextStyle(
-                fontSize = Dimen.txt17,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.primary
-            ),
-            maxLines = 1
-        )
-
-        AppButton(modifier = Modifier
-            .constrainAs(refBtnAdd){
-                start.linkTo(parent.start, dimen30)
-                top.linkTo(refTxtTotalAmount.bottom, Dimen.dimen17)
-                end.linkTo(parent.end, dimen30)
-                width = Dimension.fillToConstraints
-            }, txt = stringResource(id = R.string.add)) {
-
-
-            when{
-                item.trim().isEmpty() -> itemError = context.getString(R.string.empty_item)
-                unitPrice.trim().isEmpty() || unitPrice.trim().toDouble() < 1 -> unitPriceError = context.getString(R.string.empty_price)
-                else -> {
-                    // Add item to the list
-                    val id = if(invoiceList.size > 0) invoiceList[invoiceList.size - 1].id + 1 else 1
-                    val newInvoice = InvoiceDto(id = id, item = item.trim(), qty = selectedQty, unitPrice = Constants.getValidatedNumber(unitPrice), totalAmount = Constants.getValidatedNumber(totalAmount))
-                    invoiceList.add(newInvoice)
-
-                    subTotal = ""
-                    invoiceList.forEach {
-                        subTotal = if (subTotal.trim().isEmpty()){
-                            Constants.getValidatedNumber(it.totalAmount.toDouble().toString())
-                        }else {
-                            Constants.getValidatedNumber((subTotal.toDouble() + it.totalAmount.toDouble()).toString())
-                        }
-                    }
-
-                    // Reset all fields
-                    item = ""
-                    selectedQty = qtyList[0]
-                    unitPrice = ""
-                    totalAmount = "0.00"
-                }
-            }
-
-        }
-
-        Items(modifier = Modifier
-            .constrainAs(refItems){
-                start.linkTo(parent.start, dimen30)
-                top.linkTo(refBtnAdd.bottom, dimen15)
-                end.linkTo(parent.end, dimen30)
-                bottom.linkTo(refBtnNext.top, dimen20)
-                width = Dimension.fillToConstraints
-                height = Dimension.fillToConstraints
-            },
-            list = invoiceList)
-
-        if (invoiceList.isNotEmpty()){
-            AppButton(
+            AppField(
                 modifier = Modifier
-                    .constrainAs(refBtnNext){
-                        start.linkTo(parent.start, dimen30)
-                        end.linkTo(parent.end, dimen30)
-                        bottom.linkTo(parent.bottom)
-                        width = Dimension.fillToConstraints},
-                txt = "${stringResource(R.string.ruppe_symbol)}$subTotal => ${stringResource(R.string.next)}"
-            ) {
-                navController.navigate(Screens.Home.GenerateInvoice.route+"/"+subTotal){
-                    popUpTo(Screens.Home.CreateInvoice.route){
-                        inclusive = true
+                    .constrainAs(refFieldItem) {
+                        start.linkTo(parent.start, Dimen.dimen30)
+                        top.linkTo(parent.top, Dimen.dimen30)
+                        end.linkTo(parent.end, Dimen.dimen30)
+                        width = Dimension.fillToConstraints
+                    },
+                value = item,
+                onValueChange = {
+                    item = it
+                    itemError = ""
+                },
+                hint = stringResource(id = R.string.description_of_item),
+                errorMsg = itemError,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            )
+
+            ExposedDropdownMenuBox(
+                modifier = Modifier
+                    .constrainAs(refDropDownQty) {
+                        start.linkTo(parent.start, Dimen.dimen30)
+                        top.linkTo(refFieldItem.bottom, Dimen.dimen17)
+                        end.linkTo(refFieldUnitPrice.start)
+                        width = Dimension.fillToConstraints
+                    },
+                expanded = isQtyDropDownMenuExpanded,
+                onExpandedChange = { isQtyDropDownMenuExpanded = !isQtyDropDownMenuExpanded }) {
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                    readOnly = true,
+                    value = "$selectedQty",
+                    onValueChange = {},
+                    label = {
+                        Text(
+                            text = stringResource(id = R.string.qty),
+                            style = TextStyle(
+                                fontSize = Dimen.fieldTxtSize,
+                                fontStyle = FontStyle.Normal,
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                    },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isQtyDropDownMenuExpanded)
+                    },
+                )
+
+                ExposedDropdownMenu(
+                    modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
+                    expanded = isQtyDropDownMenuExpanded,
+                    onDismissRequest = { isQtyDropDownMenuExpanded = false }) {
+                    qtyList.forEach { qty ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = "$qty",
+                                    style = TextStyle(
+                                        fontStyle = FontStyle.Normal,
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = Dimen.txt13,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                )
+                            },
+                            onClick = {
+                                isQtyDropDownMenuExpanded = false
+                                selectedQty = qty
+
+                                updateTotalAmount()
+                            }
+                        )
+
+                    }
+                }
+
+            }
+
+            AppField(
+                modifier = Modifier
+                    .constrainAs(refFieldUnitPrice) {
+                        start.linkTo(refDropDownQty.end, Dimen.dimen15)
+                        top.linkTo(refFieldItem.bottom, Dimen.dimen17)
+                        end.linkTo(parent.end, Dimen.dimen30)
+                        width = Dimension.fillToConstraints
+                    },
+                value = unitPrice,
+                onValueChange = {
+                    unitPrice = Constants.getValidatedNumber(it)
+                    unitPriceError = ""
+
+                    updateTotalAmount()
+                },
+                hint = stringResource(id = R.string.price),
+                errorMsg = unitPriceError,
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            )
+
+            Text(
+                modifier = Modifier
+                    .constrainAs(refTxtTotalAmount) {
+                        top.linkTo(refDropDownQty.bottom, Dimen.dimen20)
+                        end.linkTo(parent.end, Dimen.dimen30)
+                    },
+                text = "${stringResource(id = R.string.ruppe_symbol)}$totalAmount",
+                style = TextStyle(
+                    fontSize = Dimen.txt17,
+                    fontStyle = FontStyle.Normal,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.primary
+                ),
+                maxLines = 1
+            )
+
+            AppButton(modifier = Modifier
+                .constrainAs(refBtnAdd){
+                    start.linkTo(parent.start, Dimen.dimen30)
+                    top.linkTo(refTxtTotalAmount.bottom, Dimen.dimen17)
+                    end.linkTo(parent.end, Dimen.dimen30)
+                    width = Dimension.fillToConstraints
+                }, txt = stringResource(id = R.string.add)) {
+
+
+                when{
+                    item.trim().isEmpty() -> itemError = context.getString(R.string.empty_item)
+                    unitPrice.trim().isEmpty() || unitPrice.trim().toDouble() < 1 -> unitPriceError = context.getString(R.string.empty_price)
+                    else -> {
+                        // Add item to the list
+                        val id = if(invoiceList.size > 0) invoiceList[invoiceList.size - 1].id + 1 else 1
+                        val newInvoice = InvoiceDto(id = id, item = item.trim(), qty = selectedQty, unitPrice = Constants.getValidatedNumber(unitPrice), totalAmount = Constants.getValidatedNumber(totalAmount))
+                        invoiceList.add(newInvoice)
+
+                        subTotal = ""
+                        invoiceList.forEach {
+                            subTotal = if (subTotal.trim().isEmpty()){
+                                Constants.getValidatedNumber(it.totalAmount.toDouble().toString())
+                            }else {
+                                Constants.getValidatedNumber((subTotal.toDouble() + it.totalAmount.toDouble()).toString())
+                            }
+                        }
+
+                        // Reset all fields
+                        item = ""
+                        selectedQty = qtyList[0]
+                        unitPrice = ""
+                        totalAmount = "0.00"
+                    }
+                }
+
+            }
+
+            Items(modifier = Modifier
+                .constrainAs(refItems){
+                    start.linkTo(parent.start, Dimen.dimen30)
+                    top.linkTo(refBtnAdd.bottom, Dimen.dimen15)
+                    end.linkTo(parent.end, Dimen.dimen30)
+                    bottom.linkTo(refBtnNext.top, Dimen.dimen20)
+                    width = Dimension.fillToConstraints
+                    height = Dimension.fillToConstraints
+                },
+                list = invoiceList)
+
+            if (invoiceList.isNotEmpty()){
+                AppButton(
+                    modifier = Modifier
+                        .constrainAs(refBtnNext){
+                            start.linkTo(parent.start, Dimen.dimen30)
+                            end.linkTo(parent.end, Dimen.dimen30)
+                            bottom.linkTo(parent.bottom)
+                            width = Dimension.fillToConstraints},
+                    txt = "${stringResource(R.string.ruppe_symbol)}$subTotal => ${stringResource(R.string.next)}"
+                ) {
+                    navController.navigate(Screens.Home.GenerateInvoice.route+"/$subTotal"){
+                        popUpTo(Screens.Home.CreateInvoice.route){
+                            inclusive = false
+                        }
                     }
                 }
             }
+
+
         }
-
-
     }
+
 }
 
 @Preview
