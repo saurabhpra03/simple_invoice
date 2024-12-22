@@ -97,7 +97,8 @@ fun GenerateInvoiceScreen(
                 .fillMaxSize()
         ) {
             val  (refTopBarDivider, refFieldCustomerName, refDropDownGST, refFieldExtraCharges,
-                refRadioBtnDiscountType, refFieldDiscount, refTotalTopDivider, refBtnGenerateInvoice) = createRefs()
+                refRadioBtnDiscountType, refFieldDiscount, refTotalTopDivider, refAmountCalculation,
+                refTotalBottomDivider, refTotalAmount, refBtnGenerateInvoice) = createRefs()
 
             HorizontalDivider(
                 modifier = Modifier
@@ -194,7 +195,7 @@ fun GenerateInvoiceScreen(
                 modifier = Modifier
                     .constrainAs(refFieldExtraCharges){
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(refFieldCustomerName.bottom, Dimen.dimen17)
+                        top.linkTo(refDropDownGST.bottom, Dimen.dimen17)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.preferredWrapContent
                     },
@@ -217,7 +218,6 @@ fun GenerateInvoiceScreen(
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     }
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen7, end = Dimen.dimen30)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -301,195 +301,18 @@ fun GenerateInvoiceScreen(
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     }
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen17, end = Dimen.dimen30)
-                    .fillMaxWidth(),
-                color = LightGrey,
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(Dimen.dimen1),
-                color = LightGrey
-            )
-
-            AppField(
-                modifier = Modifier
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen17, end = Dimen.dimen30)
-                    .fillMaxWidth(),
-                value = viewModel.name,
-                onValueChange = {
-                    viewModel.name = it
-                    viewModel.nameError = ""
-                },
-                hint = stringResource(R.string.name),
-                errorMsg = viewModel.nameError,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            )
-
-            ExposedDropdownMenuBox(
-                modifier = Modifier
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen17, end = Dimen.dimen30)
-                    .fillMaxWidth(),
-                expanded = isGSTDropDownMenuExpanded,
-                onExpandedChange = { isGSTDropDownMenuExpanded = !isGSTDropDownMenuExpanded }) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                    readOnly = true,
-                    value = viewModel.selectedGST,
-                    onValueChange = {},
-                    label = {
-                        Text(
-                            text = stringResource(id = R.string.gst),
-                            style = TextStyle(
-                                fontSize = Dimen.fieldTxtSize,
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal
-                            )
-                        )
-                    },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isGSTDropDownMenuExpanded)
-                    },
-                )
-
-                ExposedDropdownMenu(
-                    modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
-                    expanded = isGSTDropDownMenuExpanded,
-                    onDismissRequest = { isGSTDropDownMenuExpanded = false }) {
-                    viewModel.gstList.forEach { gst ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = gst,
-                                    style = TextStyle(
-                                        fontStyle = FontStyle.Normal,
-                                        fontWeight = FontWeight.Normal,
-                                        fontSize = Dimen.txt13,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-                                )
-                            },
-                            onClick = {
-                                isGSTDropDownMenuExpanded = false
-                                viewModel.selectedGST = gst
-                                viewModel.calculateGST()
-                            }
-                        )
-
-                    }
-                }
-            }
-
-            AppField(
-                modifier = Modifier
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen30, end = Dimen.dimen30)
-                    .fillMaxWidth(),
-                value = viewModel.extraCharges,
-                onValueChange = {
-                    viewModel.extraCharges = Constants.getValidatedNumber(it.trim())
-                    viewModel.calculateTotalAmount()
-                },
-                hint = stringResource(R.string.extra_charges),
-                errorMsg = "",
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            )
-
-            Row(
-                modifier = Modifier
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen7, end = Dimen.dimen30)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    modifier = Modifier.padding(end = Dimen.dimen7),
-                    text = stringResource(R.string.discount_type),
-                    style = TextStyle(
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = Dimen.txt13,
-                        color = Black
-                    )
-                )
-
-                viewModel.discountOptions.forEach { options ->
-                    Row(
-                        modifier = Modifier
-                            .padding(end = Dimen.dimen7),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        RadioButton(
-                            selected = viewModel.selectedDiscountOption == options,
-                            onClick = {
-                                viewModel.selectedDiscountOption = options
-                                viewModel.discount = ""
-                                viewModel.discountAmount = "0.00"
-                            }
-                        )
-
-                        Text(
-                            text = stringResource(options),
-                            style = TextStyle(
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = Dimen.txt13,
-                                color = if(viewModel.selectedDiscountOption == options) MaterialTheme.colorScheme.primary else Black
-                            )
-                        )
-                    }
-                }
-            }
-
-            if (viewModel.selectedDiscountOption != viewModel.discountOptions[0]){
-                val discountSymbol = if(viewModel.selectedDiscountOption == viewModel.discountOptions[1]) stringResource(R.string.ruppe_symbol) else stringResource(R.string.percentage_symbol)
-                AppField(
-                    modifier = Modifier
-                        .padding(horizontal = Dimen.dimen30)
-                        .fillMaxWidth(),
-                    value = viewModel.discount,
-                    onValueChange = {
-                        if (it.trim().isNotEmpty()){
-                            val validInput = Constants.getValidatedNumber(it)
-
-                            viewModel.discount = if (discountSymbol == "%" && validInput.toDouble() in 0.0..100.0){
-                                validInput
-                            }else{
-                                validInput
-                            }
-                            viewModel.calculateDiscount()
-                        }
-                    },
-                    hint = stringResource(R.string.discount),
-                    errorMsg = discountError.value,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                )
-            }
-
-            HorizontalDivider(
-                modifier = Modifier
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen17, end = Dimen.dimen30)
                     .fillMaxWidth(),
                 color = LightGrey,
             )
 
             Row(
                 modifier = Modifier
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen17, end = Dimen.dimen30)
-                    .fillMaxWidth(),
+                    .constrainAs(refAmountCalculation){
+                        start.linkTo(parent.start, Dimen.dimen30)
+                        top.linkTo(refTotalTopDivider.bottom, Dimen.dimen17)
+                        end.linkTo(parent.end, Dimen.dimen30)
+                        width = Dimension.fillToConstraints
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(modifier = Modifier.padding(end = Dimen.dimen7)) {
@@ -565,15 +388,23 @@ fun GenerateInvoiceScreen(
 
             HorizontalDivider(
                 modifier = Modifier
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen17, end = Dimen.dimen30)
-                    .fillMaxWidth(),
+                    .constrainAs(refTotalBottomDivider){
+                        start.linkTo(parent.start, Dimen.dimen30)
+                        top.linkTo(refAmountCalculation.bottom, Dimen.dimen17)
+                        end.linkTo(parent.end, Dimen.dimen30)
+                        width = Dimension.fillToConstraints
+                    },
                 color = LightGrey
             )
 
             Row(
                 modifier = Modifier
-                    .padding(start = Dimen.dimen30, top = Dimen.dimen3, end = Dimen.dimen30)
-                    .fillMaxWidth(),
+                    .constrainAs(refTotalAmount){
+                        start.linkTo(parent.start, Dimen.dimen30)
+                        top.linkTo(refTotalBottomDivider.bottom, Dimen.dimen3)
+                        end.linkTo(parent.end, Dimen.dimen30)
+                        width = Dimension.fillToConstraints
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
