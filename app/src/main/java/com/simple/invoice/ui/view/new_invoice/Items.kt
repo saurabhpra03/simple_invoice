@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.simple.invoice.R
-import com.simple.invoice.data.module.InvoiceDto
+import com.simple.invoice.data.module.InvoiceItem
 import com.simple.invoice.ui.theme.Black
 import com.simple.invoice.ui.theme.Dimen.cardElevation
 import com.simple.invoice.ui.theme.Dimen.dimen7
@@ -32,7 +32,7 @@ import com.simple.invoice.utils.Constants
 @Composable
 fun Items(
     modifier: Modifier,
-    list: MutableList<InvoiceDto>,
+    list: MutableList<InvoiceItem>,
 ){
     LazyColumn(
         modifier = modifier

@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -41,7 +42,9 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.simple.invoice.R
+import com.simple.invoice.common.AppButton
 import com.simple.invoice.common.AppField
+import com.simple.invoice.data.module.InvoiceItem
 import com.simple.invoice.ui.theme.Black
 import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.ui.theme.LightGrey
@@ -54,11 +57,18 @@ fun GenerateInvoiceScreen(
     navController: NavController,
     viewModel: GenerateInvoiceViewModel = hiltViewModel(),
     initialSubTotal: String,
+    items: MutableList<InvoiceItem>
 ) {
+    val context = LocalContext.current
+
     viewModel.subTotal = initialSubTotal
+    viewModel.totalAmount = initialSubTotal
+
+    var name by remember { mutableStateOf("") }
+    var nameError by remember { mutableStateOf("") }
 
     var isGSTDropDownMenuExpanded by remember { mutableStateOf(false) }
-    val discountError = remember { mutableStateOf("") }
+    var discountError by remember { mutableStateOf("") }
 
     Scaffold(
         modifier = Modifier
@@ -116,17 +126,17 @@ fun GenerateInvoiceScreen(
                 modifier = Modifier
                     .constrainAs(refFieldCustomerName){
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(refTopBarDivider.bottom, Dimen.dimen17)
+                        top.linkTo(refTopBarDivider.bottom, Dimen.dimen13)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     },
-                value = viewModel.name,
+                value = name,
                 onValueChange = {
-                    viewModel.name = it
-                    viewModel.nameError = ""
+                    nameError = ""
+                    name = it
                 },
                 hint = stringResource(R.string.name),
-                errorMsg = viewModel.nameError,
+                errorMsg = nameError,
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
             )
@@ -135,7 +145,7 @@ fun GenerateInvoiceScreen(
                 modifier = Modifier
                     .constrainAs(refDropDownGST){
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(refFieldCustomerName.bottom, Dimen.dimen17)
+                        top.linkTo(refFieldCustomerName.bottom, Dimen.dimen13)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     },
@@ -195,7 +205,7 @@ fun GenerateInvoiceScreen(
                 modifier = Modifier
                     .constrainAs(refFieldExtraCharges){
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(refDropDownGST.bottom, Dimen.dimen17)
+                        top.linkTo(refDropDownGST.bottom, Dimen.dimen25)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.preferredWrapContent
                     },
@@ -214,7 +224,7 @@ fun GenerateInvoiceScreen(
                 modifier = Modifier
                     .constrainAs(refRadioBtnDiscountType){
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(refFieldExtraCharges.bottom, Dimen.dimen17)
+                        top.linkTo(refFieldExtraCharges.bottom, Dimen.dimen3)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     }
@@ -275,6 +285,7 @@ fun GenerateInvoiceScreen(
                         .fillMaxWidth(),
                     value = viewModel.discount,
                     onValueChange = {
+                        discountError = ""
                         if (it.trim().isNotEmpty()){
                             val validInput = Constants.getValidatedNumber(it)
 
@@ -287,7 +298,7 @@ fun GenerateInvoiceScreen(
                         }
                     },
                     hint = stringResource(R.string.discount),
-                    errorMsg = discountError.value,
+                    errorMsg = discountError,
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
                 )
@@ -297,7 +308,7 @@ fun GenerateInvoiceScreen(
                 modifier = Modifier
                     .constrainAs(refTotalTopDivider){
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(if (viewModel.selectedDiscountOption != viewModel.discountOptions[0]) refFieldDiscount.bottom else refRadioBtnDiscountType.bottom, Dimen.dimen17)
+                        top.linkTo(if (viewModel.selectedDiscountOption != viewModel.discountOptions[0]) refFieldDiscount.bottom else refRadioBtnDiscountType.bottom, Dimen.dimen13)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     }
@@ -305,99 +316,30 @@ fun GenerateInvoiceScreen(
                 color = LightGrey,
             )
 
-            Row(
+
+            SubTotals(
                 modifier = Modifier
                     .constrainAs(refAmountCalculation){
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(refTotalTopDivider.bottom, Dimen.dimen17)
+                        top.linkTo(refTotalTopDivider.bottom, Dimen.dimen13)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     },
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(modifier = Modifier.padding(end = Dimen.dimen7)) {
-                    Text(
-                        text = "${stringResource(R.string.sub_total)}:",
-                        style = TextStyle(
-                            fontSize = Dimen.txt15,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    )
-                    Text(
-                        text = stringResource(R.string.gst) + "(${viewModel.selectedGST}):",
-                        style = TextStyle(
-                            fontSize = Dimen.txt15,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    )
-                    Text(
-                        text = "${stringResource(R.string.extra_charges)}:",
-                        style = TextStyle(
-                            fontSize = Dimen.txt15,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    )
-                    Text(
-                        text = if (viewModel.selectedDiscountOption == viewModel.discountOptions[2]) "${stringResource(R.string.discount)}(${viewModel.discount}%):" else "${stringResource(R.string.discount)}:",
-                        style = TextStyle(
-                            fontSize = Dimen.txt15,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    )
-                }
-
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = "${stringResource(R.string.ruppe_symbol)}${viewModel.subTotal}",
-                        style = TextStyle(
-                            fontSize = Dimen.txt15,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    )
-                    Text(
-                        text = "${stringResource(R.string.ruppe_symbol)}${viewModel.gstAmount}",
-                        style = TextStyle(
-                            fontSize = Dimen.txt15,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    )
-                    Text(
-                        text = "${stringResource(R.string.ruppe_symbol)}${viewModel.extraCharges.ifEmpty { "0.00" }}",
-                        style = TextStyle(
-                            fontSize = Dimen.txt15,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    )
-                    Text(
-                        text = "${stringResource(R.string.ruppe_symbol)}${viewModel.discountAmount}",
-                        style = TextStyle(
-                            fontSize = Dimen.txt15,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    )
-                }
-            }
+                viewModel = viewModel
+            )
 
             HorizontalDivider(
                 modifier = Modifier
                     .constrainAs(refTotalBottomDivider){
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(refAmountCalculation.bottom, Dimen.dimen17)
+                        top.linkTo(refAmountCalculation.bottom, Dimen.dimen7)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     },
                 color = LightGrey
             )
 
-            Row(
+            TxtTotalAmount(
                 modifier = Modifier
                     .constrainAs(refTotalAmount){
                         start.linkTo(parent.start, Dimen.dimen30)
@@ -405,29 +347,103 @@ fun GenerateInvoiceScreen(
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     },
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "${stringResource(R.string.total_amount)}:",
-                    style = TextStyle(
-                        fontSize = Dimen.txt17,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                )
+                viewModel = viewModel
+            )
 
-                Text(
-                    text = "${stringResource(R.string.ruppe_symbol)}${viewModel.totalAmount}",
-                    style = TextStyle(
-                        fontSize = Dimen.txt17,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                )
+            AppButton(
+                modifier = Modifier
+                    .constrainAs(refBtnGenerateInvoice){
+                        start.linkTo(parent.start, Dimen.dimen30)
+                        top.linkTo(refTotalAmount.bottom, Dimen.dimen17)
+                        end.linkTo(parent.end, Dimen.dimen30)
+                        width = Dimension.fillToConstraints
+                    },
+                txt = stringResource(R.string.generate_invoice)
+            ) {
+
+                    when{
+                        name.isEmpty() -> {
+                            nameError = context.getString(R.string.empty_name)
+                        }
+
+                        viewModel.selectedDiscountOption != viewModel.discountOptions[0] && viewModel.discount.isEmpty() -> {
+                            discountError = context.getString(R.string.empty_discount)
+                        }
+
+                        else -> {
+
+                        }
+                    }
+
             }
         }
 
+    }
+}
+
+@Composable
+fun SubTotals(
+    modifier: Modifier,
+    viewModel: GenerateInvoiceViewModel
+){
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.padding(end = Dimen.dimen7)) {
+            TxtSubTotals("${stringResource(R.string.sub_total)}:")
+            TxtSubTotals(stringResource(R.string.gst) + "(${viewModel.selectedGST}):")
+            TxtSubTotals("${stringResource(R.string.extra_charges)}:")
+            TxtSubTotals(if (viewModel.selectedDiscountOption == viewModel.discountOptions[2]) "${stringResource(R.string.discount)}(${viewModel.discount}%):" else "${stringResource(R.string.discount)}:")
+        }
+
+        Column(horizontalAlignment = Alignment.End) {
+            TxtSubTotals("${stringResource(R.string.ruppe_symbol)}${viewModel.subTotal}")
+            TxtSubTotals("${stringResource(R.string.ruppe_symbol)}${viewModel.gstAmount}")
+            TxtSubTotals("${stringResource(R.string.ruppe_symbol)}${viewModel.extraCharges.ifEmpty { "0.00" }}")
+            TxtSubTotals("${stringResource(R.string.ruppe_symbol)}${viewModel.discountAmount}")
+        }
+    }
+}
+
+@Composable
+fun TxtSubTotals(txt: String){
+    Text(
+        text = txt,
+        style = TextStyle(
+            fontSize = Dimen.txt13,
+            fontStyle = FontStyle.Normal,
+            fontWeight = FontWeight.Normal,
+        )
+    )
+}
+
+@Composable
+fun TxtTotalAmount(
+    modifier: Modifier,
+    viewModel: GenerateInvoiceViewModel){
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "${stringResource(R.string.total_amount)}:",
+            style = TextStyle(
+                fontSize = Dimen.txt15,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        )
+
+        Text(
+            text = "${stringResource(R.string.ruppe_symbol)}${viewModel.totalAmount}",
+            style = TextStyle(
+                fontSize = Dimen.txt15,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        )
     }
 }

@@ -3,23 +3,20 @@ package com.simple.invoice.ui.view
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.google.gson.Gson
+import com.simple.invoice.data.module.InvoiceItem
 import com.simple.invoice.ui.theme.SimpleInvoiceTheme
-import com.simple.invoice.utils.Screens
 import com.simple.invoice.ui.view.new_invoice.CreateInvoice
 import com.simple.invoice.ui.view.new_invoice.GenerateInvoiceScreen
+import com.simple.invoice.utils.Screens
 import com.simple.invoice.utils.SharedPref
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -55,15 +52,17 @@ class MainActivity : ComponentActivity() {
                         }
 
 
-                        composable(
-                            route = Screens.Home.GenerateInvoice.route+"/{sub_total}",
-                            arguments = listOf(navArgument("sub_total") {
-                                type = NavType.StringType
-                            })
-                        ) {
+                        composable(Screens.Home.GenerateInvoice.route) {
+
+                            val subTotal = it.arguments?.getString("sub_total") ?: "0.00"
+
+                            val data = it.arguments?.getString("items")
+                            val list = Gson().fromJson(data, Array<InvoiceItem>::class.java).toMutableList()
+
                             GenerateInvoiceScreen(
                                 navController = navController,
-                                initialSubTotal = it.arguments?.getString("sub_total") ?: "0.00"
+                                initialSubTotal = subTotal,
+                                items = list
                             )
                         }
 

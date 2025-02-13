@@ -27,7 +27,7 @@ object Constants {
     fun Context.toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 
     fun calculateItemTotalAmount(quantity: Int, price: Double): String{
-        return getValidatedNumber((price * quantity).toString())
+        return getValidatedNumber("${(price * quantity).toBigDecimal()}",20)
     }
 
     /**
@@ -38,7 +38,7 @@ object Constants {
      * @param value The original numeric string input.
      * @return The validated and formatted numeric string.
      */
-    fun getValidatedNumber(input: String): String {
+    fun getValidatedNumber(input: String, beforeDecimalDigits: Int = 7): String {
         // Remove unwanted characters, allowing only digits and a single decimal point
         val filteredChars = input.filterIndexed { index, char ->
             char.isDigit() || (char == '.' && input.indexOf('.') == index)  // Only take the first decimal point
@@ -57,8 +57,9 @@ object Constants {
             roundedNumber.toString()
         } else {
             // No decimal point: only take up to 7 digits
-            filteredChars.take(7)
+            filteredChars.take(beforeDecimalDigits)
         }
     }
+
 
 }

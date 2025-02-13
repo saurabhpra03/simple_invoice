@@ -8,12 +8,12 @@ import com.simple.invoice.data.Resource
 import com.simple.invoice.data.db.entity.AuthEntity
 import com.simple.invoice.data.networking.CoroutineDispatcherProvider
 import com.simple.invoice.data.repository.AuthRepository
+import com.simple.invoice.utils.Log.logE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,6 +22,8 @@ class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
     private val coroutineDispatcherProvider: CoroutineDispatcherProvider
 ) : ViewModel() {
+
+    private val TAG = AuthViewModel::class.java.simpleName
 
     private val _signUpFlow = MutableStateFlow<Resource<AuthEntity>?>(null)
     val signUpFlow: StateFlow<Resource<AuthEntity>?> get() = _signUpFlow
@@ -33,22 +35,20 @@ class AuthViewModel @Inject constructor(
         _signUpFlow.value = Resource.Loading
         viewModelScope.launch(coroutineDispatcherProvider.IO()) {
             try {
-                val result = repository.addUser(auth)
-                withContext(coroutineDispatcherProvider.Main()) {
-                    if (result > 0) {
-                        auth.id = result.toInt()
-                        _signUpFlow.value = Resource.Success(auth)
-                    } else {
-                        _signUpFlow.value =
-                            Resource.Failed(context.getString(R.string.email_id_or_account_already_exists))
-                    }
+                val response = repository.addUser(auth)
+                if (response > 0) {
+                    auth.id = response.toInt()
+                    _signUpFlow.value = Resource.Success(auth)
+                } else {
+                    TAG.logE("signUp, error, response: $response")
+                    _signUpFlow.value =
+                        Resource.Failed(context.getString(R.string.email_id_or_account_already_exists))
                 }
             } catch (e: Exception) {
-                withContext(coroutineDispatcherProvider.Main()) {
-                    _signUpFlow.value = Resource.Failed(
-                        e.message ?: context.getString(R.string.error_occurred_try_again)
-                    )
-                }
+                TAG.logE("signUp, exception: ${e.message}")
+                _signUpFlow.value = Resource.Failed(
+                    e.message ?: context.getString(R.string.error_occurred_try_again)
+                )
             }
         }
     }
@@ -61,9 +61,11 @@ class AuthViewModel @Inject constructor(
                 response?.let {
                     _loginFlow.value = Resource.Success(it)
                 } ?: run {
+                    TAG.logE("login, error: response null")
                     _loginFlow.value = Resource.Failed(context.getString(R.string.login_failed))
                 }
             } catch (e: Exception) {
+                TAG.logE("login, exception: ${e.message}")
                 _loginFlow.value = Resource.Failed(
                     e.message ?: context.getString(R.string.error_occurred_try_again)
                 )

@@ -35,10 +35,11 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
 import com.simple.invoice.R
 import com.simple.invoice.common.AppButton
 import com.simple.invoice.common.AppField
-import com.simple.invoice.data.module.InvoiceDto
+import com.simple.invoice.data.module.InvoiceItem
 import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.ui.theme.LightGrey
 import com.simple.invoice.utils.Constants
@@ -69,7 +70,7 @@ fun CreateInvoice(navController: NavController) {
     var subTotal by remember { mutableStateOf("0.00") }
 
     // List to hold the current invoice items
-    val invoiceList = remember { mutableStateListOf<InvoiceDto>() }
+    val invoiceList = remember { mutableStateListOf<InvoiceItem>() }
 
 
     fun updateTotalAmount(){
@@ -124,7 +125,7 @@ fun CreateInvoice(navController: NavController) {
                 modifier = Modifier
                     .constrainAs(refFieldItem) {
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(parent.top, Dimen.dimen30)
+                        top.linkTo(parent.top, Dimen.dimen13)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     },
@@ -143,7 +144,7 @@ fun CreateInvoice(navController: NavController) {
                 modifier = Modifier
                     .constrainAs(refDropDownQty) {
                         start.linkTo(parent.start, Dimen.dimen30)
-                        top.linkTo(refFieldItem.bottom, Dimen.dimen17)
+                        top.linkTo(refFieldItem.bottom, Dimen.dimen13)
                         end.linkTo(refFieldUnitPrice.start)
                         width = Dimension.fillToConstraints
                     },
@@ -206,7 +207,7 @@ fun CreateInvoice(navController: NavController) {
                 modifier = Modifier
                     .constrainAs(refFieldUnitPrice) {
                         start.linkTo(refDropDownQty.end, Dimen.dimen15)
-                        top.linkTo(refFieldItem.bottom, Dimen.dimen17)
+                        top.linkTo(refFieldItem.bottom, Dimen.dimen13)
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     },
@@ -254,15 +255,15 @@ fun CreateInvoice(navController: NavController) {
                     else -> {
                         // Add item to the list
                         val id = if(invoiceList.size > 0) invoiceList[invoiceList.size - 1].id + 1 else 1
-                        val newInvoice = InvoiceDto(id = id, item = item.trim(), qty = selectedQty, unitPrice = Constants.getValidatedNumber(unitPrice), totalAmount = Constants.getValidatedNumber(totalAmount))
+                        val newInvoice = InvoiceItem(id = id, item = item.trim(), qty = selectedQty, unitPrice = Constants.getValidatedNumber(unitPrice), totalAmount = totalAmount)
                         invoiceList.add(newInvoice)
 
                         subTotal = ""
                         invoiceList.forEach {
                             subTotal = if (subTotal.trim().isEmpty()){
-                                Constants.getValidatedNumber(it.totalAmount.toDouble().toString())
+                                Constants.getValidatedNumber(it.totalAmount)
                             }else {
-                                Constants.getValidatedNumber((subTotal.toDouble() + it.totalAmount.toDouble()).toString())
+                                Constants.getValidatedNumber("${subTotal.toBigDecimal() + it.totalAmount.toBigDecimal()}")
                             }
                         }
 
@@ -297,7 +298,9 @@ fun CreateInvoice(navController: NavController) {
                             width = Dimension.fillToConstraints},
                     txt = "${stringResource(R.string.ruppe_symbol)}$subTotal => ${stringResource(R.string.next)}"
                 ) {
-                    navController.navigate(Screens.Home.GenerateInvoice.route+"/$subTotal"){
+                    navController.navigate(Screens.Home.GenerateInvoice.route
+                        .replace("{sub_total}",subTotal)
+                        .replace("{items}",Gson().toJson(invoiceList))){
                         popUpTo(Screens.Home.CreateInvoice.route){
                             inclusive = false
                         }

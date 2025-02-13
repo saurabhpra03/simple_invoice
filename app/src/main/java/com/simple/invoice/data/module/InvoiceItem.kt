@@ -1,6 +1,6 @@
 package com.simple.invoice.data.module
 
-data class InvoiceDto(
+data class InvoiceItem(
     val id: Int,
     val item: String,
     val qty: Int,

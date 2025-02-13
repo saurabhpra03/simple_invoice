@@ -8,9 +8,8 @@ import com.simple.invoice.data.db.dao.AuthDao
 import com.simple.invoice.data.db.dao.InvoiceDao
 import com.simple.invoice.data.db.entity.AuthEntity
 import com.simple.invoice.data.db.entity.InvoiceEntity
-import com.simple.invoice.data.db.entity.InvoiceItemsEntity
 
-@Database(entities = [AuthEntity::class, InvoiceEntity::class, InvoiceItemsEntity::class], version = 1)
+@Database(entities = [AuthEntity::class, InvoiceEntity::class], version = 1)
 abstract class MyAppDB : RoomDatabase() {
 
     abstract fun authDao(): AuthDao

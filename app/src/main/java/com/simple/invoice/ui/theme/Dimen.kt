@@ -10,9 +10,11 @@ object Dimen {
     val dimen3: Dp = 3.dp
     val dimen7: Dp = 7.dp
     val dimen45: Dp = 45.dp
+    val dimen13: Dp = 13.dp
     val dimen15: Dp = 15.dp
     val dimen17: Dp = 17.dp
     val dimen20: Dp = 20.dp
+    val dimen25: Dp = 25.dp
     val dimen30: Dp = 30.dp
     val dimen70: Dp = 70.dp
 

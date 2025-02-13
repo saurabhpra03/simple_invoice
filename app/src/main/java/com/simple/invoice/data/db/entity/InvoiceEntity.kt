@@ -16,10 +16,13 @@ data class InvoiceEntity(
     val authId: Int,
     val invoiceNo: String,
     val date: Long,
+    val items: String,
+    val name: String,
     val subTotal: Double,
     val gst: String,
     val extraCharges: Double,
     val discount: Double,
+    val discountType: String,
     val totalAmount: Double,
     val createdAt: Long = System.currentTimeMillis()
 )

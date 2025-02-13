@@ -36,4 +36,6 @@
     <string name="discount">Discount</string>
     <string name="empty_discount">Please enter discount.</string>
     <string name="sub_total">SubTotal</string>
+    <string name="invoice_generated_successfully">Invoice generated successfully</string>
+    <string name="something_went_wrong_please_try_again">Something went wrong. Please try again.</string>
 </resources>
