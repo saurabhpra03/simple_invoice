@@ -18,11 +18,11 @@ data class InvoiceEntity(
     val date: Long,
     val items: String,
     val name: String,
-    val subTotal: Double,
+    val subTotal: String,
     val gst: String,
-    val extraCharges: Double,
-    val discount: Double,
+    val extraCharges: String,
+    val discount: String,
     val discountType: String,
-    val totalAmount: Double,
+    val totalAmount: String,
     val createdAt: Long = System.currentTimeMillis()
 )

@@ -7,6 +7,8 @@ import android.widget.Toast
 import androidx.navigation.NavController
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 object Constants {
 
@@ -59,6 +61,12 @@ object Constants {
             // No decimal point: only take up to 7 digits
             filteredChars.take(beforeDecimalDigits)
         }
+    }
+
+    fun Long.convertTimeInMillisToDate(): String{
+        val dateFormatter = SimpleDateFormat("dd-MMM-yyy",Locale.getDefault())
+        return dateFormatter.format(this)
+
     }
 
 

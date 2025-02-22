@@ -13,7 +13,7 @@ interface InvoiceDao {
     suspend fun addInvoice(invoice: InvoiceEntity) : Long
 
     @Query("SELECT * FROM invoice WHERE authId = :authId ORDER BY id DESC")
-    suspend fun getInvoices(authId: Int): List<InvoiceEntity>
+    suspend fun getInvoices(authId: Int): List<InvoiceEntity>?
 
     @Delete
     suspend fun deleteInvoice(invoice: InvoiceEntity)

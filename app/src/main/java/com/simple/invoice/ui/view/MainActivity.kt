@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.simple.invoice.data.module.InvoiceItem
 import com.simple.invoice.ui.theme.SimpleInvoiceTheme
+import com.simple.invoice.ui.view.invoices.Invoices
 import com.simple.invoice.ui.view.new_invoice.CreateInvoice
 import com.simple.invoice.ui.view.new_invoice.GenerateInvoiceScreen
 import com.simple.invoice.utils.Screens
@@ -44,8 +45,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(
                         navController = navController,
-                        startDestination = Screens.Home.CreateInvoice.route
+                        startDestination = Screens.Home.Invoices.route
                     ) {
+
+                        composable(Screens.Home.Invoices.route) {
+                            Invoices(navController)
+                        }
 
                         composable(Screens.Home.CreateInvoice.route) {
                             CreateInvoice(navController = navController)
@@ -61,6 +66,7 @@ class MainActivity : ComponentActivity() {
 
                             GenerateInvoiceScreen(
                                 navController = navController,
+                                sharedPref = sharedPref,
                                 initialSubTotal = subTotal,
                                 items = list
                             )

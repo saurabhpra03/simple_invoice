@@ -13,8 +13,6 @@ import com.simple.invoice.data.db.entity.InvoiceEntity
 import com.simple.invoice.data.networking.CoroutineDispatcherProvider
 import com.simple.invoice.data.repository.InvoiceRepository
 import com.simple.invoice.utils.Constants
-import com.simple.invoice.utils.Log.logE
-import com.simple.invoice.utils.SharedPref
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,15 +24,12 @@ import javax.inject.Inject
 @HiltViewModel
 class GenerateInvoiceViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val sharedPref: SharedPref,
     private val repository: InvoiceRepository,
     private val coroutineDispatcherProvider: CoroutineDispatcherProvider
 ): ViewModel() {
 
-    private val TAG = GenerateInvoiceViewModel::class.java.simpleName
-
-    private val _addInvoiceFlow = MutableStateFlow<Resource<String>?>(null)
-    val addInvoiceFlow: StateFlow<Resource<String>?> get() = _addInvoiceFlow
+    private val _createInvoice = MutableStateFlow<Resource<String>?>(null)
+    val createInvoice: StateFlow<Resource<String>?> get() = _createInvoice
 
     val gstList = listOf("0%", "5%", "12%", "18%", "28%")
     var selectedGST by mutableStateOf(gstList[0])
@@ -80,23 +75,24 @@ class GenerateInvoiceViewModel @Inject constructor(
 
 
     fun addInvoice(invoice: InvoiceEntity){
-
-        _addInvoiceFlow.value = Resource.Loading
+        _createInvoice.value = Resource.Loading
         viewModelScope.launch(coroutineDispatcherProvider.IO()) {
             try {
                 val response = repository.addInvoice(invoice)
-               _addInvoiceFlow.value =  if (response > 0){
+                _createInvoice.value =  if (response > 0){
                     Resource.Success(context.getString(R.string.invoice_generated_successfully))
                 }else{
-                    TAG.logE("addInvoice, error, response: $response")
                     Resource.Failed(context.getString(R.string.something_went_wrong_please_try_again))
                 }
             }catch (e: Exception){
-                TAG.logE("addInvoice, exception: ${e.message}")
-                _addInvoiceFlow.value = Resource.Failed(
+                _createInvoice.value = Resource.Failed(
                     e.message ?: context.getString(R.string.error_occurred_try_again)
                 )
             }
         }
+    }
+
+    fun resetCreateInvoiceFlow(){
+        _createInvoice.value = null
     }
 }

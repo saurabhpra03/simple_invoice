@@ -9,7 +9,9 @@ object Dimen {
     val dimen1: Dp = 1.dp
     val dimen3: Dp = 3.dp
     val dimen7: Dp = 7.dp
+    val dimen10: Dp = 10.dp
     val dimen45: Dp = 45.dp
+    val dimen50: Dp = 50.dp
     val dimen13: Dp = 13.dp
     val dimen15: Dp = 15.dp
     val dimen17: Dp = 17.dp
@@ -18,6 +20,7 @@ object Dimen {
     val dimen30: Dp = 30.dp
     val dimen70: Dp = 70.dp
 
+    val screenPadding: Dp = dimen20
     val buttonHeight: Dp = dimen45
     val cardElevation: Dp = dimen7
 
@@ -26,8 +29,10 @@ object Dimen {
 
     // TextUnit
 
+    val txt11: TextUnit = 11.sp
     val txt12: TextUnit = 12.sp
     val txt13: TextUnit = 13.sp
+    val txt14: TextUnit = 14.sp
     val txt15: TextUnit = 15.sp
     val txt17: TextUnit = 17.sp
 

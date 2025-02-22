@@ -24,6 +24,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,25 +42,36 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.simple.invoice.R
 import com.simple.invoice.common.AppButton
 import com.simple.invoice.common.AppField
+import com.simple.invoice.data.Resource
+import com.simple.invoice.data.db.entity.InvoiceEntity
 import com.simple.invoice.data.module.InvoiceItem
 import com.simple.invoice.ui.theme.Black
 import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.ui.theme.LightGrey
 import com.simple.invoice.ui.viewModel.GenerateInvoiceViewModel
 import com.simple.invoice.utils.Constants
+import com.simple.invoice.utils.Constants.toast
+import com.simple.invoice.utils.Log.logD
+import com.simple.invoice.utils.Screens
+import com.simple.invoice.utils.SharedPref
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenerateInvoiceScreen(
     navController: NavController,
+    sharedPref: SharedPref,
     viewModel: GenerateInvoiceViewModel = hiltViewModel(),
     initialSubTotal: String,
     items: MutableList<InvoiceItem>
 ) {
     val context = LocalContext.current
+    val authId = lazy { sharedPref.getAuth()?.id ?: 0 }
+
+    val createInvoiceFlow = viewModel.createInvoice.collectAsState()
 
     viewModel.subTotal = initialSubTotal
     viewModel.totalAmount = initialSubTotal
@@ -347,7 +359,7 @@ fun GenerateInvoiceScreen(
                         end.linkTo(parent.end, Dimen.dimen30)
                         width = Dimension.fillToConstraints
                     },
-                viewModel = viewModel
+                totalAmount = viewModel.totalAmount
             )
 
             AppButton(
@@ -371,6 +383,25 @@ fun GenerateInvoiceScreen(
                         }
 
                         else -> {
+                            val timeInMillis = System.currentTimeMillis()
+
+                            val invoice = InvoiceEntity(
+                                id = 0,
+                                authId = authId.value,
+                                invoiceNo = "#INV$timeInMillis${(1000..9999).random()}",
+                                date = timeInMillis,
+                                items = Gson().toJson(items),
+                                name = name,
+                                subTotal = viewModel.subTotal,
+                                gst = viewModel.selectedGST,
+                                extraCharges = viewModel.extraCharges,
+                                discount = viewModel.discount,
+                                discountType = context.getString(viewModel.selectedDiscountOption),
+                                totalAmount = viewModel.totalAmount,
+                                createdAt = timeInMillis
+                            )
+
+                            viewModel.addInvoice(invoice)
 
                         }
                     }
@@ -379,6 +410,31 @@ fun GenerateInvoiceScreen(
         }
 
     }
+
+    createInvoiceFlow.value?.let {
+        when(it){
+            is Resource.Loading -> {}
+
+            is Resource.Success -> {
+
+                viewModel.resetCreateInvoiceFlow()
+
+                context.toast(it.data)
+
+                navController.navigate(Screens.Home.Invoices.route){
+                    popUpTo(Screens.Home.Invoices.route){
+                        inclusive = true
+                    }
+                }
+
+            }
+
+            is Resource.Failed -> {
+                context.toast(it.msg)
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -421,7 +477,7 @@ fun TxtSubTotals(txt: String){
 @Composable
 fun TxtTotalAmount(
     modifier: Modifier,
-    viewModel: GenerateInvoiceViewModel){
+    totalAmount: String){
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -437,7 +493,7 @@ fun TxtTotalAmount(
         )
 
         Text(
-            text = "${stringResource(R.string.ruppe_symbol)}${viewModel.totalAmount}",
+            text = "${stringResource(R.string.ruppe_symbol)}$totalAmount",
             style = TextStyle(
                 fontSize = Dimen.txt15,
                 fontStyle = FontStyle.Normal,
