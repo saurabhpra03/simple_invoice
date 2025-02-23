@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,6 +37,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.simple.invoice.R
+import com.simple.invoice.common.AlertConfirmation
 import com.simple.invoice.common.AppButton
 import com.simple.invoice.common.AppField
 import com.simple.invoice.data.module.InvoiceItem
@@ -79,7 +77,7 @@ fun CreateInvoice(navController: NavController) {
     var deleteItem by remember { mutableStateOf<InvoiceItem?>(null) }
 
     if (showItemDeleteAlert) {
-        ShowAlertDeleteItem(
+        AlertConfirmation(
             onDismiss = { showItemDeleteAlert = false },
             onConfirm = {
                 showItemDeleteAlert = false
@@ -348,59 +346,6 @@ fun CreateInvoice(navController: NavController) {
         }
     }
 
-}
-
-@Composable
-private fun ShowAlertDeleteItem(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
-){
-    AlertDialog(
-        containerColor = MaterialTheme.colorScheme.background,
-        shape = RoundedCornerShape(Dimen.dimen3),
-        onDismissRequest = onDismiss,
-        text = {
-            Text(
-                text = stringResource(R.string.are_you_sure),
-                style = TextStyle(
-                    fontSize = Dimen.txt14,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            )
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss
-            ){
-                Text(
-                    text = stringResource(R.string.no),
-                    style = TextStyle(
-                        fontSize = Dimen.txt17,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = onConfirm
-            ){
-                Text(
-                    text = stringResource(R.string.yes),
-                    style = TextStyle(
-                        fontSize = Dimen.txt17,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                )
-            }
-        }
-    )
 }
 
 @Preview

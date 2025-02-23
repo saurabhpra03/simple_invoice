@@ -18,8 +18,8 @@ object Dimen {
     val dimen20: Dp = 20.dp
     val dimen25: Dp = 25.dp
     val dimen30: Dp = 30.dp
-    val dimen70: Dp = 70.dp
     val dimen80: Dp = 70.dp
+    val dimen85: Dp = 85.dp
 
     val screenPadding: Dp = dimen20
     val buttonHeight: Dp = dimen45

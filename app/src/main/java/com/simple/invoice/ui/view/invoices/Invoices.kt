@@ -5,12 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -18,25 +13,29 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.simple.invoice.R
+import com.simple.invoice.common.AlertConfirmation
 import com.simple.invoice.common.AppLoader
 import com.simple.invoice.data.Resource
+import com.simple.invoice.data.db.entity.InvoiceEntity
 import com.simple.invoice.ui.theme.Dimen
-import com.simple.invoice.ui.theme.Grey
 import com.simple.invoice.ui.theme.LightGrey
 import com.simple.invoice.ui.viewModel.InvoicesViewModel
-import com.simple.invoice.utils.Constants.convertTimeInMillisToDate
+import com.simple.invoice.utils.Constants.toast
 import com.simple.invoice.utils.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,8 +47,42 @@ fun Invoices(
 
     val context = LocalContext.current
 
+    var showDeleteInvoiceAlert by remember { mutableStateOf(false) }
+    var invoiceEntity by remember { mutableStateOf<InvoiceEntity?>(null) }
+
+    if (showDeleteInvoiceAlert) {
+        AlertConfirmation(
+            onDismiss = { showDeleteInvoiceAlert = false },
+            onConfirm = {
+                showDeleteInvoiceAlert = false
+                invoiceEntity?.let {
+                    viewModel.deleteInvoice(it)
+                    invoiceEntity = null
+                }
+            }
+        )
+    }
+
     viewModel.fetchInvoices()
     val invoicesFlow = viewModel.invoices.collectAsState()
+    val invoiceDeleteFlow = viewModel.deleteInvoice.collectAsState()
+
+    invoiceDeleteFlow.value?.let {
+        when(it){
+            is Resource.Loading -> {}
+
+            is Resource.Success -> {
+                context.toast(it.data)
+                viewModel.resetInvoiceDeleteFlow()
+                viewModel.fetchInvoices()
+            }
+
+            is Resource.Failed -> {
+                context.toast(it.msg)
+                viewModel.resetInvoiceDeleteFlow()
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -60,7 +93,8 @@ fun Invoices(
                 modifier = Modifier
                     .fillMaxWidth(),
                 title = {
-                    Text(context.getString(R.string.invoices),
+                    Text(
+                        context.getString(R.string.invoices),
                         style = TextStyle(
                             fontSize = Dimen.txt17,
                             color = MaterialTheme.colorScheme.primary,
@@ -83,7 +117,7 @@ fun Invoices(
 
             HorizontalDivider(
                 modifier = Modifier
-                    .constrainAs(refTopBarDivider){
+                    .constrainAs(refTopBarDivider) {
                         start.linkTo(parent.start)
                         top.linkTo(parent.top)
                         end.linkTo(parent.end)
@@ -94,12 +128,12 @@ fun Invoices(
             )
 
             invoicesFlow.value?.let {
-                when(it){
+                when (it) {
 
                     is Resource.Loading -> {
                         AppLoader(
                             modifier = Modifier
-                                .constrainAs(refLoader){
+                                .constrainAs(refLoader) {
                                     start.linkTo(parent.start)
                                     top.linkTo(parent.top)
                                     end.linkTo(parent.end)
@@ -110,116 +144,29 @@ fun Invoices(
 
                     is Resource.Success -> {
 
-                        LazyColumn(
+                        InvoiceItems(
                             modifier = Modifier
-                                .constrainAs(refInvoices){
+                                .constrainAs(refInvoices) {
                                     start.linkTo(parent.start, Dimen.screenPadding)
                                     top.linkTo(parent.top, Dimen.screenPadding)
                                     end.linkTo(parent.end, Dimen.screenPadding)
                                     bottom.linkTo(parent.bottom)
                                     width = Dimension.fillToConstraints
                                     height = Dimension.fillToConstraints
-                                }
-                        ) {
-                            items(it.data.size){ index ->
-                                val invoice = it.data[index]
-
-                                ElevatedCard(
-                                    modifier = Modifier
-                                        .padding(bottom = Dimen.dimen10)
-                                        .fillMaxWidth()
-                                        .wrapContentHeight(),
-                                    colors = CardDefaults.elevatedCardColors(
-                                        containerColor = MaterialTheme.colorScheme.surface
-                                    ),
-                                    shape = RoundedCornerShape(Dimen.dimen3)
-                                ) {
-                                    ConstraintLayout(
-                                        modifier = Modifier
-                                            .padding(Dimen.dimen7)
-                                            .fillMaxWidth()
-                                    ) {
-                                        val (refDate, refCustomerName, refInvoiceNo, refTotalAmount) = createRefs()
-
-                                        Text(
-                                            modifier = Modifier
-                                                .constrainAs(refDate){
-                                                    top.linkTo(parent.top)
-                                                    end.linkTo(parent.end)
-                                                },
-                                            text = invoice.date.convertTimeInMillisToDate(),
-                                            style = TextStyle(
-                                                fontSize = Dimen.txt11,
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.Normal,
-                                                color = MaterialTheme.colorScheme.onBackground
-                                            )
-                                        )
-
-                                        Text(
-                                            modifier = Modifier
-                                                .constrainAs(refCustomerName){
-                                                    start.linkTo(parent.start)
-                                                    top.linkTo(refDate.bottom, Dimen.dimen3)
-                                                    end.linkTo(parent.end)
-                                                    width = Dimension.fillToConstraints
-                                                },
-                                            text = invoice.name,
-                                            style = TextStyle(
-                                                fontSize = Dimen.txt14,
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.SemiBold,
-                                                color = MaterialTheme.colorScheme.onBackground
-                                            ),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-
-                                        Text(
-                                            modifier = Modifier
-                                                .constrainAs(refInvoiceNo){
-                                                    start.linkTo(parent.start)
-                                                    top.linkTo(refCustomerName.bottom)
-                                                    end.linkTo(parent.end)
-                                                    width = Dimension.fillToConstraints
-                                                },
-                                            text = invoice.invoiceNo,
-                                            style = TextStyle(
-                                                fontSize = Dimen.txt11,
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.Normal,
-                                                color = Grey
-                                            ),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-
-                                        Text(
-                                            modifier = Modifier
-                                                .constrainAs(refTotalAmount){
-                                                    top.linkTo(refInvoiceNo.bottom, Dimen.dimen7)
-                                                    end.linkTo(parent.end)
-                                                },
-                                            text = context.getString(R.string.ruppe_symbol) + invoice.totalAmount,
-                                            style = TextStyle(
-                                                fontSize = Dimen.txt17,
-                                                fontStyle = FontStyle.Normal,
-                                                fontWeight = FontWeight.Bold,
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                        )
-                                    }
-                                }
-
+                                },
+                            list = it.data,
+                            onDelete = { invoice ->
+                                showDeleteInvoiceAlert = true
+                                invoiceEntity = invoice
                             }
-                        }
+                        )
 
                     }
 
                     is Resource.Failed -> {
                         Text(
                             modifier = Modifier
-                                .constrainAs(refEmpty){
+                                .constrainAs(refEmpty) {
                                     start.linkTo(parent.start)
                                     top.linkTo(parent.top)
                                     end.linkTo(parent.end)
@@ -240,13 +187,13 @@ fun Invoices(
 
             AddInvoice(
                 modifier = Modifier
-                    .constrainAs(refCreateInvoice){
+                    .constrainAs(refCreateInvoice) {
                         end.linkTo(parent.end, Dimen.screenPadding)
                         bottom.linkTo(parent.bottom, Dimen.screenPadding)
                     }
-            ){
-                navController.navigate(Screens.Home.CreateInvoice.route){
-                    popUpTo(Screens.Home.Invoices.route){
+            ) {
+                navController.navigate(Screens.Home.CreateInvoice.route) {
+                    popUpTo(Screens.Home.Invoices.route) {
                         inclusive = false
                     }
                 }
