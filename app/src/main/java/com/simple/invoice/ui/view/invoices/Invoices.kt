@@ -5,9 +5,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,11 +41,13 @@ import com.simple.invoice.ui.theme.LightGrey
 import com.simple.invoice.ui.viewModel.InvoicesViewModel
 import com.simple.invoice.utils.Constants.toast
 import com.simple.invoice.utils.Screens
+import com.simple.invoice.utils.SharedPref
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Invoices(
     navController: NavController,
+    sharedPref: SharedPref,
     viewModel: InvoicesViewModel = hiltViewModel()
 ) {
 
@@ -49,6 +55,8 @@ fun Invoices(
 
     var showDeleteInvoiceAlert by remember { mutableStateOf(false) }
     var invoiceEntity by remember { mutableStateOf<InvoiceEntity?>(null) }
+
+    var showLogoutAlert by remember { mutableStateOf(false) }
 
     if (showDeleteInvoiceAlert) {
         AlertConfirmation(
@@ -59,6 +67,16 @@ fun Invoices(
                     viewModel.deleteInvoice(it)
                     invoiceEntity = null
                 }
+            }
+        )
+    }
+
+    if (showLogoutAlert){
+        AlertConfirmation(
+            onDismiss = { showLogoutAlert = false },
+            onConfirm = {
+                showDeleteInvoiceAlert = false
+                sharedPref.logout()
             }
         )
     }
@@ -101,6 +119,17 @@ fun Invoices(
                             fontWeight = FontWeight.Bold
                         )
                     )
+                },
+                actions = {
+                    IconButton(
+                        onClick = { showLogoutAlert = true }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Logout,
+                            contentDescription = "Logout",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             )
         }

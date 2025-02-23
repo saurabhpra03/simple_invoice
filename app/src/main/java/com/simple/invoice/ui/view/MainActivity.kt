@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                     ) {
 
                         composable(Screens.Home.Invoices.route) {
-                            Invoices(navController)
+                            Invoices(navController, sharedPref)
                         }
 
                         composable(Screens.Home.CreateInvoice.route) {

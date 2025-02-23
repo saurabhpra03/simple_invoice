@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import com.google.gson.Gson
 import com.simple.invoice.data.db.entity.AuthEntity
+import com.simple.invoice.ui.view.auth.AuthActivity
+import com.simple.invoice.utils.Constants.finishAndGotoNextActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -24,6 +26,15 @@ class SharedPref @Inject constructor(@ApplicationContext private val activity: C
         val data = pref.getString(KEY_AUTH, null)
         val auth = Gson().fromJson(data, AuthEntity::class.java)
         return auth
+    }
+
+    fun logout(){
+        val pref = activity.getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit()
+        pref.clear()
+        pref.apply()
+
+        activity.finishAndGotoNextActivity(AuthActivity::class.java)
+
     }
 
 }
