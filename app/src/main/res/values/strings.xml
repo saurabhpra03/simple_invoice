@@ -44,4 +44,5 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="invoice_deleted_successfully">Invoice deleted successfully</string>
+    <string name="invoice_details">Invoice Details</string>
 </resources>

@@ -301,7 +301,6 @@ fun CreateInvoice(navController: NavController) {
                         totalAmount = "0.00"
                     }
                 }
-
             }
 
             Items(modifier = Modifier

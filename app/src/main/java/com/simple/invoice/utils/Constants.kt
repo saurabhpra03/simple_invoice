@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.navigation.NavController
+import com.simple.invoice.R
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
@@ -30,6 +31,26 @@ object Constants {
 
     fun calculateItemTotalAmount(quantity: Int, price: Double): String{
         return getValidatedNumber("${(price * quantity).toBigDecimal()}",20)
+    }
+
+    fun calculateGST(gst: String, subTotal: String): String {
+        return if (gst != "0%") {
+            getValidatedNumber("${subTotal.toBigDecimal() * gst.replace("%", "").toBigDecimal() / 100.toBigDecimal()}")
+        } else {
+            "0.00"
+        }
+    }
+
+    fun calculateDiscount(context: Context, discountOption: String, discount: String, subTotal: String): String {
+        return when (discountOption) {
+            context.getString(R.string.ruppe_symbol) -> getValidatedNumber(discount)
+            context.getString(R.string.percentage_symbol) -> {
+                if (discount.isNotEmpty()) {
+                    getValidatedNumber("${subTotal.toBigDecimal() * (discount.toDouble() / 100).toBigDecimal()}")
+                } else "0.00"
+            }
+            else -> "0.00"
+        }
     }
 
     /**

@@ -15,6 +15,9 @@ interface InvoiceDao {
     @Query("SELECT * FROM invoice WHERE authId = :authId ORDER BY id DESC")
     suspend fun getInvoices(authId: Int): List<InvoiceEntity>?
 
+    @Query("SELECT * FROM invoice WHERE authId = :authId AND id = :id")
+    suspend fun getInvoice(authId: Int, id: Int): InvoiceEntity?
+
     @Delete
     suspend fun deleteInvoice(invoice: InvoiceEntity)
 

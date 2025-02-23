@@ -10,5 +10,7 @@ class InvoiceRepository @Inject constructor(private val invoiceDao: InvoiceDao) 
 
     suspend fun getInvoices(authId: Int) = invoiceDao.getInvoices(authId)
 
+    suspend fun getInvoice(authId: Int, id: Int) = invoiceDao.getInvoice(authId, id)
+
     suspend fun deleteInvoice(invoice: InvoiceEntity) = invoiceDao.deleteInvoice(invoice)
 }

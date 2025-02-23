@@ -45,24 +45,12 @@ class GenerateInvoiceViewModel @Inject constructor(
     var totalAmount by mutableStateOf("0.00")
 
     fun calculateGST() {
-        gstAmount = if (selectedGST != gstList[0]) {
-            Constants.getValidatedNumber("${subTotal.toBigDecimal() * selectedGST.replace("%", "").toBigDecimal() / 100.toBigDecimal()}")
-        } else {
-            "0.00"
-        }
+        gstAmount = Constants.calculateGST(selectedGST, subTotal)
         calculateTotalAmount()
     }
 
     fun calculateDiscount() {
-        discountAmount = when (selectedDiscountOption) {
-            discountOptions[1] -> Constants.getValidatedNumber(discount)
-            discountOptions[2] -> {
-                if (discount.isNotEmpty()) {
-                    Constants.getValidatedNumber("${subTotal.toBigDecimal() * (discount.toDouble() / 100).toBigDecimal()}")
-                } else "0.00"
-            }
-            else -> "0.00"
-        }
+        discountAmount = Constants.calculateDiscount(context, context.getString(selectedDiscountOption), discount, subTotal)
         calculateTotalAmount()
     }
 

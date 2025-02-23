@@ -29,6 +29,9 @@ class InvoicesViewModel @Inject constructor(
     private val _invoices = MutableStateFlow<Resource<List<InvoiceEntity>>?>(null)
     val invoices: StateFlow<Resource<List<InvoiceEntity>>?> get() = _invoices
 
+    private val _invoice = MutableStateFlow<Resource<InvoiceEntity>?>(null)
+    val invoice: StateFlow<Resource<InvoiceEntity>?> get() = _invoice
+
     private val _deleteInvoice = MutableStateFlow<Resource<String>?>(null)
     val deleteInvoice: StateFlow<Resource<String>?> get() = _deleteInvoice
 
@@ -51,6 +54,22 @@ class InvoicesViewModel @Inject constructor(
                 _invoices.value = Resource.Failed(
                     e.message ?: context.getString(R.string.something_went_wrong_please_try_again)
                 )
+            }
+        }
+    }
+
+    fun fetchInvoice(id: Int){
+        _invoice.value = Resource.Loading
+        viewModelScope.launch(coroutineDispatcherProvider.IO()) {
+            try {
+                val response = repository.getInvoice(authId, id)
+                response?.let {
+                    _invoice.value = Resource.Success(it)
+                } ?: run {
+                    _invoice.value = Resource.Failed(context.getString(R.string.no_invoice_found))
+                }
+            }catch (e: Exception){
+                _invoice.value = Resource.Failed(context.getString(R.string.something_went_wrong_please_try_again))
             }
         }
     }

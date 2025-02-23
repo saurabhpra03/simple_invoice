@@ -12,8 +12,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
+import com.simple.invoice.data.db.entity.InvoiceEntity
 import com.simple.invoice.data.module.InvoiceItem
 import com.simple.invoice.ui.theme.SimpleInvoiceTheme
+import com.simple.invoice.ui.view.invoice_details.InvoiceDetails
 import com.simple.invoice.ui.view.invoices.Invoices
 import com.simple.invoice.ui.view.new_invoice.CreateInvoice
 import com.simple.invoice.ui.view.new_invoice.GenerateInvoiceScreen
@@ -50,6 +52,11 @@ class MainActivity : ComponentActivity() {
 
                         composable(Screens.Home.Invoices.route) {
                             Invoices(navController, sharedPref)
+                        }
+
+                        composable(Screens.Home.InvoiceDetails.route) {
+                            val id = it.arguments?.getString("id")
+                            InvoiceDetails(navController,id!!.toInt())
                         }
 
                         composable(Screens.Home.CreateInvoice.route) {

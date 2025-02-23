@@ -31,6 +31,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.simple.invoice.R
 import com.simple.invoice.common.AlertConfirmation
 import com.simple.invoice.common.AppLoader
@@ -184,6 +185,14 @@ fun Invoices(
                                     height = Dimension.fillToConstraints
                                 },
                             list = it.data,
+                            onClick = { invoice ->
+                                navController.navigate(Screens.Home.InvoiceDetails.route
+                                    .replace("{id}", "${invoice.id}")){
+                                    popUpTo(Screens.Home.Invoices.route){
+                                        inclusive = false
+                                    }
+                                }
+                            },
                             onDelete = { invoice ->
                                 showDeleteInvoiceAlert = true
                                 invoiceEntity = invoice

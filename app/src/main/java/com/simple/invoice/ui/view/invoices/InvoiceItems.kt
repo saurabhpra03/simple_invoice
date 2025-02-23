@@ -47,6 +47,7 @@ import kotlin.math.roundToInt
 fun InvoiceItems(
     modifier: Modifier,
     list: List<InvoiceEntity>,
+    onClick: (InvoiceEntity) -> Unit,
     onDelete: (InvoiceEntity) -> Unit
 ) {
 
@@ -94,7 +95,10 @@ fun InvoiceItems(
                 ElevatedCard(
                     modifier = Modifier
                         .offset { IntOffset(offsetX.roundToInt(),0) }
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .clickable {
+                            onClick(invoice)
+                        },
                     colors = CardDefaults.elevatedCardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     ),
