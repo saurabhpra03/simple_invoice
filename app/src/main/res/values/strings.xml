@@ -40,4 +40,7 @@
     <string name="something_went_wrong_please_try_again">Something went wrong. Please try again.</string>
     <string name="no_invoice_found">No Invoice Found</string>
     <string name="invoices">Invoices</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

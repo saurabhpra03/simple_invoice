@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -72,11 +75,26 @@ fun CreateInvoice(navController: NavController) {
     // List to hold the current invoice items
     val invoiceList = remember { mutableStateListOf<InvoiceItem>() }
 
+    var showItemDeleteAlert by remember { mutableStateOf(false) }
+    var deleteItem by remember { mutableStateOf<InvoiceItem?>(null) }
 
-    fun updateTotalAmount(){
-        totalAmount = if (unitPrice.trim().isNotEmpty() && unitPrice.toDouble() > 0){
-            Constants.calculateItemTotalAmount(selectedQty,unitPrice.toDouble())
-        }else{
+    if (showItemDeleteAlert) {
+        ShowAlertDeleteItem(
+            onDismiss = { showItemDeleteAlert = false },
+            onConfirm = {
+                showItemDeleteAlert = false
+                deleteItem?.let {
+                    invoiceList.remove(it)
+                    deleteItem = null
+                }}
+        )
+    }
+
+
+    fun updateTotalAmount() {
+        totalAmount = if (unitPrice.trim().isNotEmpty() && unitPrice.toDouble() > 0) {
+            Constants.calculateItemTotalAmount(selectedQty, unitPrice.toDouble())
+        } else {
             "0.00"
         }
 
@@ -90,7 +108,8 @@ fun CreateInvoice(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth(),
                 title = {
-                    Text("Add Invoice Items",
+                    Text(
+                        "Add Invoice Items",
                         style = TextStyle(
                             fontSize = Dimen.txt17,
                             color = MaterialTheme.colorScheme.primary,
@@ -111,7 +130,7 @@ fun CreateInvoice(navController: NavController) {
 
             HorizontalDivider(
                 modifier = Modifier
-                    .constrainAs(refTopBarDivider){
+                    .constrainAs(refTopBarDivider) {
                         start.linkTo(parent.start)
                         top.linkTo(parent.top)
                         end.linkTo(parent.end)
@@ -241,28 +260,38 @@ fun CreateInvoice(navController: NavController) {
             )
 
             AppButton(modifier = Modifier
-                .constrainAs(refBtnAdd){
+                .constrainAs(refBtnAdd) {
                     start.linkTo(parent.start, Dimen.dimen30)
                     top.linkTo(refTxtTotalAmount.bottom, Dimen.dimen17)
                     end.linkTo(parent.end, Dimen.dimen30)
                     width = Dimension.fillToConstraints
-                }, txt = stringResource(id = R.string.add)) {
+                }, txt = stringResource(id = R.string.add)
+            ) {
 
 
-                when{
+                when {
                     item.trim().isEmpty() -> itemError = context.getString(R.string.empty_item)
-                    unitPrice.trim().isEmpty() || unitPrice.trim().toDouble() < 1 -> unitPriceError = context.getString(R.string.empty_price)
+                    unitPrice.trim().isEmpty() || unitPrice.trim()
+                        .toDouble() < 1 -> unitPriceError = context.getString(R.string.empty_price)
+
                     else -> {
                         // Add item to the list
-                        val id = if(invoiceList.size > 0) invoiceList[invoiceList.size - 1].id + 1 else 1
-                        val newInvoice = InvoiceItem(id = id, item = item.trim(), qty = selectedQty, unitPrice = Constants.getValidatedNumber(unitPrice), totalAmount = totalAmount)
+                        val id =
+                            if (invoiceList.size > 0) invoiceList[invoiceList.size - 1].id + 1 else 1
+                        val newInvoice = InvoiceItem(
+                            id = id,
+                            item = item.trim(),
+                            qty = selectedQty,
+                            unitPrice = Constants.getValidatedNumber(unitPrice),
+                            totalAmount = totalAmount
+                        )
                         invoiceList.add(newInvoice)
 
                         subTotal = ""
                         invoiceList.forEach {
-                            subTotal = if (subTotal.trim().isEmpty()){
+                            subTotal = if (subTotal.trim().isEmpty()) {
                                 Constants.getValidatedNumber(it.totalAmount)
-                            }else {
+                            } else {
                                 Constants.getValidatedNumber("${subTotal.toBigDecimal() + it.totalAmount.toBigDecimal()}")
                             }
                         }
@@ -278,7 +307,7 @@ fun CreateInvoice(navController: NavController) {
             }
 
             Items(modifier = Modifier
-                .constrainAs(refItems){
+                .constrainAs(refItems) {
                     start.linkTo(parent.start, Dimen.dimen30)
                     top.linkTo(refBtnAdd.bottom, Dimen.dimen15)
                     end.linkTo(parent.end, Dimen.dimen30)
@@ -286,22 +315,29 @@ fun CreateInvoice(navController: NavController) {
                     width = Dimension.fillToConstraints
                     height = Dimension.fillToConstraints
                 },
-                list = invoiceList)
+                list = invoiceList,
+                onDelete = {
+                    deleteItem = it
+                    showItemDeleteAlert = true
+                })
 
-            if (invoiceList.isNotEmpty()){
+            if (invoiceList.isNotEmpty()) {
                 AppButton(
                     modifier = Modifier
-                        .constrainAs(refBtnNext){
+                        .constrainAs(refBtnNext) {
                             start.linkTo(parent.start, Dimen.dimen30)
                             end.linkTo(parent.end, Dimen.dimen30)
                             bottom.linkTo(parent.bottom)
-                            width = Dimension.fillToConstraints},
+                            width = Dimension.fillToConstraints
+                        },
                     txt = "${stringResource(R.string.ruppe_symbol)}$subTotal => ${stringResource(R.string.next)}"
                 ) {
-                    navController.navigate(Screens.Home.GenerateInvoice.route
-                        .replace("{sub_total}",subTotal)
-                        .replace("{items}",Gson().toJson(invoiceList))){
-                        popUpTo(Screens.Home.CreateInvoice.route){
+                    navController.navigate(
+                        Screens.Home.GenerateInvoice.route
+                            .replace("{sub_total}", subTotal)
+                            .replace("{items}", Gson().toJson(invoiceList))
+                    ) {
+                        popUpTo(Screens.Home.CreateInvoice.route) {
                             inclusive = false
                         }
                     }
@@ -312,6 +348,59 @@ fun CreateInvoice(navController: NavController) {
         }
     }
 
+}
+
+@Composable
+private fun ShowAlertDeleteItem(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+){
+    AlertDialog(
+        containerColor = MaterialTheme.colorScheme.background,
+        shape = RoundedCornerShape(Dimen.dimen3),
+        onDismissRequest = onDismiss,
+        text = {
+            Text(
+                text = stringResource(R.string.are_you_sure),
+                style = TextStyle(
+                    fontSize = Dimen.txt14,
+                    fontStyle = FontStyle.Normal,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            )
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ){
+                Text(
+                    text = stringResource(R.string.no),
+                    style = TextStyle(
+                        fontSize = Dimen.txt17,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm
+            ){
+                Text(
+                    text = stringResource(R.string.yes),
+                    style = TextStyle(
+                        fontSize = Dimen.txt17,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
+        }
+    )
 }
 
 @Preview
