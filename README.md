@@ -10,26 +10,23 @@ A simple Android application for managing invoices. Built using Jetpack Compose,
 
 ## Screenshots
 
-### 1. Login Screen
+### 1. Login Screen and SignUp
 
-![Login Screen](./screenshots/login.png)
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+  <img src="./screenshots/login.png" alt="Login Screen" width="30%" />
+  <img src="./screenshots/sign_up.png" alt="SignUp" width="30%" />
+</div>
 
-### 2. SignUp
+### 2. Add Invoice Items and Generate Invoice
 
-![Invoice Creation](./screenshots/sign_up.png)
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+  <img src="./screenshots/add_invoice_items.png" alt="Add Invoice Items" width="30%" />
+  <img src="./screenshots/generate_invoice.png" alt="Generate Invoice" width="30%" />
+</div>
 
-### 3. Invoices
+### 3. Invoices and Invoice Details
 
-![Share Invoice](./screenshots/invoices.png)
-
-### 4. Invoice Details
-
-![Share Invoice](./screenshots/details.png)
-
-### 4. Add Invoice Items
-
-![Invoice List](./screenshots/add_invoice_items.png)
-
-### 5. Generate Invoice
-
-![Share Invoice](./screenshots/generate_invoice.png)
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+  <img src="./screenshots/invoices.png" alt="Invoices" width="30%" />
+  <img src="./screenshots/details.png" alt="Invoice Details" width="30%" />
+</div>
