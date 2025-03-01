@@ -12,7 +12,7 @@ A simple Android application for managing invoices. Built using Jetpack Compose,
 
 ### 1. Login Screen
 
-![Login Screen](./screenshots/login_screen.png)
+![Login Screen](./screenshots/login.png)
 
 ### 2. Invoice Creation
 
