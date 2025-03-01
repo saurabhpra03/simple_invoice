@@ -14,14 +14,22 @@ A simple Android application for managing invoices. Built using Jetpack Compose,
 
 ![Login Screen](./screenshots/login.png)
 
-### 2. Invoice Creation
+### 2. SignUp
 
-![Invoice Creation](./screenshots/invoice_creation.png)
+![Invoice Creation](./screenshots/sign_up.png)
 
-### 3. Invoice List
+### 3. Invoices
 
-![Invoice List](./screenshots/invoice_list.png)
+![Share Invoice](./screenshots/invoices.png)
 
-### 4. Share Invoice
+### 4. Invoice Details
 
-![Share Invoice](./screenshots/share_invoice.png)
+![Share Invoice](./screenshots/details.png)
+
+### 4. Add Invoice Items
+
+![Invoice List](./screenshots/add_invoice_items.png)
+
+### 5. Generate Invoice
+
+![Share Invoice](./screenshots/generate_invoice.png)
