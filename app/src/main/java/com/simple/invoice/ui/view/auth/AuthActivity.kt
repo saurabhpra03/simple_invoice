@@ -15,6 +15,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.simple.invoice.common.AppStatusBarColor
 import com.simple.invoice.ui.theme.SimpleInvoiceTheme
+import com.simple.invoice.ui.view.MainActivity
+import com.simple.invoice.utils.Constants.finishAndGotoNextActivity
 import com.simple.invoice.utils.Screens
 import com.simple.invoice.utils.SharedPref
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,6 +33,10 @@ class AuthActivity : ComponentActivity() {
         setContent {
 
             val navController = rememberNavController()
+
+            sharedPref.getAuth()?.let {
+                this.finishAndGotoNextActivity(MainActivity::class.java)
+            }
 
             SimpleInvoiceTheme(
                 darkTheme = false,

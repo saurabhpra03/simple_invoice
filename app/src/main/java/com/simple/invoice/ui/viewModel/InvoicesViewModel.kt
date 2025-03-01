@@ -1,16 +1,12 @@
 package com.simple.invoice.ui.viewModel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simple.invoice.R
 import com.simple.invoice.data.Resource
 import com.simple.invoice.data.db.entity.InvoiceEntity
-import com.simple.invoice.data.networking.CoroutineDispatcherProvider
 import com.simple.invoice.data.repository.InvoiceRepository
 import com.simple.invoice.utils.SharedPref
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,10 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InvoicesViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val repository: InvoiceRepository,
-    private val sharedPref: SharedPref,
-    private val coroutineDispatcherProvider: CoroutineDispatcherProvider
+    private val sharedPref: SharedPref
 ) : ViewModel() {
 
     private val authId = sharedPref.getAuth()?.id ?: 0
@@ -36,57 +30,19 @@ class InvoicesViewModel @Inject constructor(
     val deleteInvoice: StateFlow<Resource<String>?> get() = _deleteInvoice
 
 
-    fun fetchInvoices() {
+    fun fetchInvoices() = viewModelScope.launch {
         _invoices.value = Resource.Loading
-        viewModelScope.launch(coroutineDispatcherProvider.IO()) {
-            try {
-                val response = repository.getInvoices(authId)
-                _invoices.value = response?.let {
-                    if (response.isNotEmpty()) {
-                        Resource.Success(response)
-                    } else {
-                        Resource.Failed(context.getString(R.string.no_invoice_found))
-                    }
-                } ?: run {
-                    Resource.Failed(context.getString(R.string.no_invoice_found))
-                }
-            } catch (e: Exception) {
-                _invoices.value = Resource.Failed(
-                    e.message ?: context.getString(R.string.something_went_wrong_please_try_again)
-                )
-            }
-        }
+        _invoices.value = repository.getInvoices(authId)
     }
 
-    fun fetchInvoice(id: Int){
+    fun fetchInvoice(id: Int) = viewModelScope.launch {
         _invoice.value = Resource.Loading
-        viewModelScope.launch(coroutineDispatcherProvider.IO()) {
-            try {
-                val response = repository.getInvoice(authId, id)
-                response?.let {
-                    _invoice.value = Resource.Success(it)
-                } ?: run {
-                    _invoice.value = Resource.Failed(context.getString(R.string.no_invoice_found))
-                }
-            }catch (e: Exception){
-                _invoice.value = Resource.Failed(context.getString(R.string.something_went_wrong_please_try_again))
-            }
-        }
+        _invoice.value = repository.getInvoice(authId, id)
     }
 
-    fun deleteInvoice(invoice: InvoiceEntity) {
+    fun deleteInvoice(invoice: InvoiceEntity) = viewModelScope.launch {
         _deleteInvoice.value = Resource.Loading
-        viewModelScope.launch(coroutineDispatcherProvider.IO()) {
-            try {
-                repository.deleteInvoice(invoice)
-                _deleteInvoice.value =
-                    Resource.Success(context.getString(R.string.invoice_deleted_successfully))
-            } catch (e: Exception) {
-                _deleteInvoice.value = Resource.Failed(
-                    e.message ?: context.getString(R.string.something_went_wrong_please_try_again)
-                )
-            }
-        }
+        _deleteInvoice.value = repository.deleteInvoice(invoice)
     }
 
     fun resetInvoiceDeleteFlow() {

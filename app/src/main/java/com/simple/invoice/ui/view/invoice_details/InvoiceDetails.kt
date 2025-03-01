@@ -1,8 +1,5 @@
 package com.simple.invoice.ui.view.invoice_details
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -36,16 +32,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.simple.invoice.R
+import com.simple.invoice.common.AppLoader
 import com.simple.invoice.data.Resource
 import com.simple.invoice.data.module.InvoiceItem
 import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.ui.theme.Grey
 import com.simple.invoice.ui.theme.LightGrey
 import com.simple.invoice.ui.view.new_invoice.Items
-import com.simple.invoice.ui.view.new_invoice.TxtSubTotals
-import com.simple.invoice.ui.view.new_invoice.TxtTotalAmount
 import com.simple.invoice.ui.viewModel.InvoicesViewModel
-import com.simple.invoice.utils.Constants
 import com.simple.invoice.utils.Constants.convertTimeInMillisToDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,7 +96,8 @@ fun InvoiceDetails(
         ) {
             val (refTopBarDivider, refName, refInvoiceNo, refDivider1, refItems,
                 refTotalTopDivider, refAmountCalculation,
-                refTotalBottomDivider, refTotalAmount, refEmpty) = createRefs()
+                refTotalBottomDivider, refTotalAmount,
+                refEmpty, refLoader) = createRefs()
 
             HorizontalDivider(
                 modifier = Modifier
@@ -118,7 +113,17 @@ fun InvoiceDetails(
 
             invoiceFlow.value?.let {
                 when (it) {
-                    is Resource.Loading -> {}
+                    is Resource.Loading -> {
+                        AppLoader(modifier = Modifier
+                            .constrainAs(refLoader) {
+                                start.linkTo(parent.start)
+                                top.linkTo(parent.top)
+                                end.linkTo(parent.end)
+                                bottom.linkTo(parent.bottom)
+                                width = Dimension.fillToConstraints
+                                height = Dimension.fillToConstraints
+                            })
+                    }
 
                     is Resource.Success -> {
 
@@ -200,7 +205,8 @@ fun InvoiceDetails(
                             color = LightGrey,
                         )
 
-                        Row(
+                        SubTotal(
+                            context = context,
                             modifier = Modifier
                                 .constrainAs(refAmountCalculation) {
                                     start.linkTo(parent.start, Dimen.screenPadding)
@@ -208,44 +214,12 @@ fun InvoiceDetails(
                                     bottom.linkTo(refTotalBottomDivider.top, Dimen.dimen7)
                                     width = Dimension.fillToConstraints
                                 },
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column(modifier = Modifier.padding(end = Dimen.dimen7)) {
-                                TxtSubTotals("${stringResource(R.string.sub_total)}:")
-                                TxtSubTotals(stringResource(R.string.gst) + "(${invoice.gst}):")
-                                TxtSubTotals("${stringResource(R.string.extra_charges)}:")
-                                TxtSubTotals(
-                                    if (invoice.discountType == context.getString(R.string.percentage_symbol)) "${
-                                        stringResource(
-                                            R.string.discount
-                                        )
-                                    }(${invoice.discount}%):" else "${stringResource(R.string.discount)}:"
-                                )
-                            }
-
-                            Column(horizontalAlignment = Alignment.End) {
-                                TxtSubTotals("${stringResource(R.string.ruppe_symbol)}${invoice.subTotal}")
-                                TxtSubTotals(
-                                    "${stringResource(R.string.ruppe_symbol)}${
-                                        Constants.calculateGST(
-                                            invoice.gst,
-                                            invoice.subTotal
-                                        )
-                                    }"
-                                )
-                                TxtSubTotals("${stringResource(R.string.ruppe_symbol)}${invoice.extraCharges.ifEmpty { "0.00" }}")
-                                TxtSubTotals(
-                                    "${stringResource(R.string.ruppe_symbol)}${
-                                        Constants.calculateDiscount(
-                                            context,
-                                            invoice.discountType,
-                                            invoice.discount,
-                                            invoice.subTotal
-                                        )
-                                    }"
-                                )
-                            }
-                        }
+                            gst = invoice.gst,
+                            discountType = invoice.discountType,
+                            discount = invoice.discount,
+                            subTotal = invoice.subTotal,
+                            extraCharges = invoice.extraCharges
+                        )
 
                         HorizontalDivider(
                             modifier = Modifier
@@ -258,7 +232,7 @@ fun InvoiceDetails(
                             color = LightGrey
                         )
 
-                        TxtTotalAmount(
+                        TotalAmount(
                             modifier = Modifier
                                 .constrainAs(refTotalAmount) {
                                     start.linkTo(parent.start, Dimen.screenPadding)
@@ -296,3 +270,4 @@ fun InvoiceDetails(
     }
 
 }
+

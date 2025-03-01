@@ -52,10 +52,10 @@ fun LoginScreen(
 
     val loginFlow = viewModel.loginFlow.collectAsState()
 
-    var emailId by remember { mutableStateOf("email@gmail.com") }
+    var emailId by remember { mutableStateOf("") }
     var emailIdError by remember { mutableStateOf("") }
 
-    var password by remember { mutableStateOf("email") }
+    var password by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
 
     ConstraintLayout(
@@ -160,6 +160,7 @@ fun LoginScreen(
 
                 is Resource.Failed -> {
                     context.toast(response.msg)
+                    viewModel.resetFlow()
                 }
 
                 is Resource.Loading -> {
@@ -174,7 +175,6 @@ fun LoginScreen(
                         })
                 }
             }
-            viewModel.clearSignInFlow()
         }
     }
 

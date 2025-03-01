@@ -49,6 +49,7 @@ import com.simple.invoice.ui.theme.Dimen
 import com.simple.invoice.ui.theme.LightGrey
 import com.simple.invoice.utils.Constants
 import com.simple.invoice.utils.Screens
+import com.simple.invoice.utils.Validator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -245,7 +246,7 @@ fun CreateInvoice(navController: NavController) {
                     },
                 value = unitPrice,
                 onValueChange = {
-                    unitPrice = Constants.getValidatedNumber(it)
+                    unitPrice = Validator.getValidatedNumber(it)
                     unitPriceError = ""
 
                     updateTotalAmount()
@@ -295,7 +296,7 @@ fun CreateInvoice(navController: NavController) {
                             id = id,
                             item = item.trim(),
                             qty = selectedQty,
-                            unitPrice = Constants.getValidatedNumber(unitPrice),
+                            unitPrice = Validator.getValidatedNumber(unitPrice),
                             totalAmount = totalAmount
                         )
                         invoiceList.add(newInvoice)
@@ -303,9 +304,9 @@ fun CreateInvoice(navController: NavController) {
                         subTotal = ""
                         invoiceList.forEach {
                             subTotal = if (subTotal.trim().isEmpty()) {
-                                Constants.getValidatedNumber(it.totalAmount)
+                                Validator.getValidatedNumber(it.totalAmount)
                             } else {
-                                Constants.getValidatedNumber("${subTotal.toBigDecimal() + it.totalAmount.toBigDecimal()}")
+                                Validator.getValidatedNumber("${subTotal.toBigDecimal() + it.totalAmount.toBigDecimal()}")
                             }
                         }
 

@@ -174,6 +174,7 @@ fun SignupScreen(
                 }
                 is Resource.Failed -> {
                     context.toast(response.msg)
+                    viewModel.resetFlow()
                 }
                 is Resource.Loading -> {
                     AppLoader(modifier = Modifier
@@ -185,7 +186,6 @@ fun SignupScreen(
                         })
                 }
             }
-            viewModel.clearSignUpFlow()
         }
 
     }

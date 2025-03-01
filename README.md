@@ -6,7 +6,6 @@ A simple Android application for managing invoices. Built using Jetpack Compose,
 
 - **User Authentication**: Register and log in to your account.
 - **Invoice Management**: Create, view, and manage invoices.
-- **Download & Share**: Download invoices and share them via WhatsApp.
 - **Modern UI**: Developed using Jetpack Compose for a seamless user experience.
 
 ## Screenshots

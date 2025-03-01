@@ -1,16 +1,12 @@
 package com.simple.invoice.data.repository
 
-import com.simple.invoice.data.db.dao.InvoiceDao
+import com.simple.invoice.data.Resource
 import com.simple.invoice.data.db.entity.InvoiceEntity
-import javax.inject.Inject
 
-class InvoiceRepository @Inject constructor(private val invoiceDao: InvoiceDao) {
+interface InvoiceRepository {
 
-    suspend fun addInvoice(invoice: InvoiceEntity) = invoiceDao.addInvoice(invoice)
-
-    suspend fun getInvoices(authId: Int) = invoiceDao.getInvoices(authId)
-
-    suspend fun getInvoice(authId: Int, id: Int) = invoiceDao.getInvoice(authId, id)
-
-    suspend fun deleteInvoice(invoice: InvoiceEntity) = invoiceDao.deleteInvoice(invoice)
+    suspend fun addInvoice(invoice: InvoiceEntity): Resource<String>
+    suspend fun getInvoices(authId: Int): Resource<List<InvoiceEntity>>
+    suspend fun getInvoice(authId: Int, id: Int): Resource<InvoiceEntity>
+    suspend fun deleteInvoice(invoice: InvoiceEntity): Resource<String>
 }

@@ -31,7 +31,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.google.gson.Gson
 import com.simple.invoice.R
 import com.simple.invoice.common.AlertConfirmation
 import com.simple.invoice.common.AppLoader
@@ -161,15 +160,15 @@ fun Invoices(
                 when (it) {
 
                     is Resource.Loading -> {
-                        AppLoader(
-                            modifier = Modifier
-                                .constrainAs(refLoader) {
-                                    start.linkTo(parent.start)
-                                    top.linkTo(parent.top)
-                                    end.linkTo(parent.end)
-                                    bottom.linkTo(parent.bottom)
-                                }
-                        )
+                        AppLoader(modifier = Modifier
+                            .constrainAs(refLoader) {
+                                start.linkTo(parent.start)
+                                top.linkTo(parent.top)
+                                end.linkTo(parent.end)
+                                bottom.linkTo(parent.bottom)
+                                width = Dimension.fillToConstraints
+                                height = Dimension.fillToConstraints
+                            })
                     }
 
                     is Resource.Success -> {

@@ -12,7 +12,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
-import com.simple.invoice.data.db.entity.InvoiceEntity
 import com.simple.invoice.data.module.InvoiceItem
 import com.simple.invoice.ui.theme.SimpleInvoiceTheme
 import com.simple.invoice.ui.view.invoice_details.InvoiceDetails
