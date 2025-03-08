@@ -140,7 +140,7 @@ fun InvoiceDetails(
                                     end.linkTo(parent.end, Dimen.screenPadding)
                                     width = Dimension.fillToConstraints
                                 },
-                            text = stringResource(R.string.name),
+                            text = invoice.name,
                             style = TextStyle(
                                 fontSize = Dimen.txt14,
                                 fontStyle = FontStyle.Normal,
